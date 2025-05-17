@@ -199,13 +199,12 @@ const quizQuestions: Question[] = [
     description: 'Is there a smell or scent that brings you peace?',
     options: [
       { id: 1, name: 'No Scent' },
-      { id: 2, name: 'Lavender' },
+      { id: 2, name: 'Sweet' },
       { id: 3, name: 'Citrus' },
       { id: 4, name: 'Floral' },
       { id: 5, name: 'Spicy' },
       { id: 6, name: 'Woodsy' },
-      { id: 7, name: 'Fresh linen' },
-      { id: 8, name: 'Vanilla' },
+      { id: 7, name: 'Clean' },
     ],
   },
   {
@@ -307,8 +306,44 @@ const quizQuestions: Question[] = [
         { id: 6, name: 'Prefer not to say' },
     ],
   },
-  
-
+  {
+    id: 24,
+    type: 'text',
+    number: 24,
+    title: 'Triggers',
+    description: 'Are there any textures or colors that you don\'t like or may bring up difficult memories for you?',
+    options: [],
+    inputType: 'text'
+  },
+  {
+    id: 25,
+    type: 'multiSelect',
+    number: 25,
+    title: 'Favorite Sounds',
+    description: 'What sounds help you feel grounded or at peace?',
+    options: [
+        { id: 1, name: 'Light Music' },
+        { id: 2, name: 'Ocean/nature sounds' },
+        { id: 3, name: 'Silence' },
+        { id: 4, name: 'Favorite songs' },
+        { id: 5, name: 'Prefer not to say' },
+    ],
+  },
+  {
+    id: 26,
+    type: 'text',
+    number: 26,
+    title: 'Favorite Way to Relax',
+    description: 'What\'s your favorite way to relax at home?',
+    options: [
+        { id: 1, name: 'Watching a good TV show' },
+        { id: 2, name: 'Reading' },
+        { id: 3, name: 'Being around others' },
+        { id: 4, name: 'Playing board games with friends' },
+        { id: 5, name: 'Prefer not to say' },
+    ],
+    inputType: 'text'
+  }
 ];
 
 export default quizQuestions; 
