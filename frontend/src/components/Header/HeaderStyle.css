@@ -21,4 +21,28 @@
   height: 75px;
   margin: 0.25rem 0;
   width: auto;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.header-logo:hover {
+  filter: drop-shadow(0 0 4px rgba(191, 149, 38, 0.8));
+}
+
+.header-logo::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(191, 149, 38, 0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.header-logo:hover::after {
+  opacity: 1;
 }

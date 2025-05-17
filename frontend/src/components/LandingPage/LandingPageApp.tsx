@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { MousePointerClick } from 'lucide-react';
+
 import './LandingPageStyle.css';
 
 interface LandingPageAppProps {
@@ -32,7 +33,10 @@ const LandingPage = ({ onTransitionComplete }: LandingPageAppProps) => {
           <p className="landing-page-description">
             Create a vision for your dream home
           </p>
-          <p className="start-text">click anywhere to start</p>
+          <div className="start-section">
+            <MousePointerClick className="start-section-icon" />
+            <p className="start-text">Click anywhere to start</p>
+          </div>
         </div>
       </div>
     </div>

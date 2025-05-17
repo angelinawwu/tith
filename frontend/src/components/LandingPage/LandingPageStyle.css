@@ -74,12 +74,29 @@
     height: calc(100vh - 10rem);
 }
 
+.start-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
 .start-text {
     color: var(--color-white);
-    font-size: 1.2rem;
-    margin-top: 2rem;
+    font-size: 2rem;
+    font-weight: 400;
     text-align: center;
     cursor: pointer;
+}
+
+/* Add style for the icon */
+.start-section-icon {
+    width: 50px;
+    height: 50px;
+    color: var(--color-white);
 }
 
 /* Remove or comment out the .start-button styles */
