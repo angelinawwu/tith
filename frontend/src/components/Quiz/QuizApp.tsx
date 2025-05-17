@@ -120,7 +120,10 @@ const Quiz: React.FC = () => {
         return option?.name || '';
       };
 
-      const getMultipleOptionTexts = (questionId: number, optionIds: number[]): string[] => {
+      const getMultipleOptionTexts = (questionId: number, optionIds: number[] | null): string[] => {
+        if (!optionIds || !Array.isArray(optionIds)) {
+          return [];
+        }
         return optionIds.map(id => getOptionText(questionId, id));
       };
 
@@ -142,7 +145,7 @@ const Quiz: React.FC = () => {
             disabilityDetails: responses[9] as string,
           },
           stylePreferences: {
-            homeMessage: getMultipleOptionTexts(11, responses[11] as number[]),
+            homeMessage: getMultipleOptionTexts(10, responses[10] as number[]),
             favoriteColors: getMultipleOptionTexts(11, responses[11] as number[]),
             styleInWords: responses[12] as string,
             styleAdmired: responses[13] as string,
@@ -191,23 +194,6 @@ const Quiz: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  // Check if all questions have been answered
-  const isFormComplete = () => {
-    return Object.entries(responses).every(([questionId, response]) => {
-      const question = quizQuestions.find(q => q.id === parseInt(questionId));
-      
-      if (!question?.required) return true;
-      
-      if (question?.type === 'text') {
-        return typeof response === 'string' && response.trim() !== '';
-      } else if (question?.type === 'multiSelect') {
-        return Array.isArray(response) && response.length > 0;
-      }
-      
-      return response !== null;
-    });
   };
 
   const validateForm = (): boolean => {
