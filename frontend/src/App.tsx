@@ -1,15 +1,24 @@
-import Header from './components/Header/HeaderApp'
-import Quiz from './components/Quiz/QuizApp'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
+import Quiz from './pages/Quiz'
+import LandingPage from './pages/LandingPage'
 import './App.css'
 
-function App() {
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <LandingPage />,
+  },
+  {
+    path: '/quiz',
+    element: <Quiz />,
+  },
+])
 
+const App = () => {
   return (
-    <div className="app-container">
-      <Header />
-      <Quiz />
-    </div>
-  )
-}
+    <RouterProvider router={router} />
+  );
+};
 
-export default App
+export default App;
