@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import axios from 'axios';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
-import './QuizApp.css';
+import './QuizStyle.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
