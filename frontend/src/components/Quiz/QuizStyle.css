@@ -1,11 +1,12 @@
 /* Quiz component styles */
 
 .quiz-container {
+  width: 100%;
   max-width: 1440px;
   margin: 0 auto;
   padding: 2rem;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--color-maroon);
+  background-color: var(--color-white);
 }
 
 .question-section {
@@ -14,6 +15,13 @@
   padding: 1.5rem;
   background-color: var(--color-white);
   box-shadow: 0 2px 8px var(--color-white-shadow);
+}
+
+.question-heading {
+  display: flex;
+  flex-direction: row;
+  align-items: left;
+  justify-content: left;
 }
 
 .question-number {
@@ -27,6 +35,12 @@
   border-radius: 50%;
   margin-right: 0.75rem;
   font-size: 1rem;
+}
+
+.question-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-black);
 }
 
 .style-options {

@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
 import './QuizStyle.css';
+import quizQuestions from './QuizQuestions';
+import type { Question, QuestionType } from './QuizQuestions';
 
 interface QuizResponse {
-  stylePreference: number | null;
-  texturePreference: number | null;
+  [key: number]: number | null | string;
 }
 
 const Quiz: React.FC = () => {
-  const [responses, setResponses] = useState<QuizResponse>({
-    stylePreference: null,
-    texturePreference: null,
-  });
+  const [responses, setResponses] = useState<QuizResponse>(
+    quizQuestions.reduce((acc, question) => {
+      acc[question.id] = question.type === 'text' ? '' : null;
+      return acc;
+    }, {} as QuizResponse)
+  );
   const [submitted, setSubmitted] = useState(false);
 
-  // Handle style preference selection
-  const handleStyleSelect = (styleId: number) => {
-    setResponses((prev) => ({ ...prev, stylePreference: styleId }));
+  // Handle option selection for any question
+  const handleOptionSelect = (questionId: number, optionId: number) => {
+    setResponses((prev) => ({ ...prev, [questionId]: optionId }));
   };
 
-  // Handle texture preference selection
-  const handleTextureSelect = (textureId: number) => {
-    setResponses((prev) => ({ ...prev, texturePreference: textureId }));
+  // Handle text input for text questions
+  const handleTextInput = (questionId: number, value: string) => {
+    setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
   // Submit form data to database
@@ -34,21 +37,114 @@ const Quiz: React.FC = () => {
     setSubmitted(true);
   };
 
-  // Placeholder styles for demo purposes
-  const styleOptions = [
-    { id: 1, name: 'Modern', description: 'Clean lines and minimal decoration' },
-    { id: 2, name: 'Traditional', description: 'Classic design with warm colors' },
-    { id: 3, name: 'Contemporary', description: 'Blend of modern and traditional' },
-  ];
+  // Check if all questions have been answered
+  const isFormComplete = () => {
+    return Object.entries(responses).every(([questionId, response]) => {
+      const question = quizQuestions.find(q => q.id === parseInt(questionId));
+      if (question?.type === 'text') {
+        return typeof response === 'string' && response.trim() !== '';
+      }
+      return response !== null;
+    });
+  };
 
-  // Texture options
-  const textureOptions = [
-    { id: 1, name: 'Rough' },
-    { id: 2, name: 'Slightly Rough' },
-    { id: 3, name: 'Medium' },
-    { id: 4, name: 'Slightly Soft' },
-    { id: 5, name: 'Soft' },
-  ];
+  // Render a style question
+  const renderStyleQuestion = (question: Question) => {
+    return (
+      <div className="style-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
+        {question.options.map((option) => (
+          <div 
+            key={option.id}
+            className={`style-option ${responses[question.id] === option.id ? 'selected' : ''}`}
+          >
+            <input 
+              type="radio"
+              id={`question-${question.id}-option-${option.id}`}
+              name={`question-${question.id}`}
+              value={option.id}
+              checked={responses[question.id] === option.id}
+              onChange={() => handleOptionSelect(question.id, option.id)}
+              className="visually-hidden"
+            />
+            <label htmlFor={`question-${question.id}-option-${option.id}`} className="style-label">
+              <div className="style-image">
+                <span className="placeholder-text">{option.name}</span>
+              </div>
+              <div className="style-info">
+                <h3>{option.name}</h3>
+                {option.description && <p>{option.description}</p>}
+              </div>
+            </label>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Render a texture question
+  const renderTextureQuestion = (question: Question) => {
+    return (
+      <div className="texture-slider-container">
+        <div className="texture-labels">
+          {question.options.map((option) => (
+            <span key={option.id}>{option.name}</span>
+          ))}
+        </div>
+        <div className="texture-slider" role="group" aria-labelledby={`question-${question.id}`}>
+          {question.options.map((option) => (
+            <div key={option.id} className="texture-option">
+              <input
+                type="radio"
+                id={`question-${question.id}-option-${option.id}`}
+                name={`question-${question.id}`}
+                value={option.id}
+                checked={responses[question.id] === option.id}
+                onChange={() => handleOptionSelect(question.id, option.id)}
+                className="visually-hidden"
+              />
+              <label 
+                htmlFor={`question-${question.id}-option-${option.id}`}
+                className={`texture-button ${responses[question.id] === option.id ? 'selected' : ''}`}
+                aria-label={option.name}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Render a text input question
+  const renderTextQuestion = (question: Question) => {
+    return (
+      <div className="text-input-container">
+        <input
+          type={question.inputType || 'text'}
+          id={`question-${question.id}`}
+          name={`question-${question.id}`}
+          value={responses[question.id] as string}
+          onChange={(e) => handleTextInput(question.id, e.target.value)}
+          placeholder={question.placeholder}
+          className="text-input"
+          required
+        />
+      </div>
+    );
+  };
+
+  // Render question based on its type
+  const renderQuestionContent = (question: Question) => {
+    switch (question.type) {
+      case 'style':
+        return renderStyleQuestion(question);
+      case 'texture':
+        return renderTextureQuestion(question);
+      case 'text':
+        return renderTextQuestion(question);
+      default:
+        return null;
+    }
+  };
 
   if (submitted) {
     return (
@@ -63,80 +159,25 @@ const Quiz: React.FC = () => {
     <div className="quiz-container">
       <h1>Interior Design Style Quiz</h1>
       <form onSubmit={handleSubmit}>
-        {/* Question 1: Style Preference */}
-        <section className="question-section">
-          <h2 id="style-question">
-            <span className="question-number">1</span> Which style best matches your personal preference?
-          </h2>
-          <div className="style-options" role="radiogroup" aria-labelledby="style-question">
-            {styleOptions.map((style) => (
-              <div 
-                key={style.id}
-                className={`style-option ${responses.stylePreference === style.id ? 'selected' : ''}`}
-              >
-                <input 
-                  type="radio"
-                  id={`style-${style.id}`}
-                  name="stylePreference"
-                  value={style.id}
-                  checked={responses.stylePreference === style.id}
-                  onChange={() => handleStyleSelect(style.id)}
-                  className="visually-hidden"
-                />
-                <label htmlFor={`style-${style.id}`} className="style-label">
-                  <div className="style-image">
-                    {/* Placeholder for style images */}
-                    <span className="placeholder-text">{style.name}</span>
-                  </div>
-                  <div className="style-info">
-                    <h3>{style.name}</h3>
-                    <p>{style.description}</p>
-                  </div>
-                </label>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Question 2: Texture Preference */}
-        <section className="question-section">
-          <h2 id="texture-question">
-            <span className="question-number">2</span> What texture do you prefer in cloth?
-          </h2>
-          <div className="texture-slider-container">
-            <div className="texture-labels">
-              {textureOptions.map((texture) => (
-                <span key={texture.id}>{texture.name}</span>
-              ))}
+        {quizQuestions.map((question) => (
+          <section key={question.id} className="question-section">
+            <div className="question-heading">
+              <h2 id={`question-${question.id}`}>
+                <span className="question-number">{question.number}</span>
+              </h2>
+              <p className="question-text">
+                {question.description}
+              </p>
             </div>
-            <div className="texture-slider" role="group" aria-labelledby="texture-question">
-              {textureOptions.map((texture) => (
-                <div key={texture.id} className="texture-option">
-                  <input
-                    type="radio"
-                    id={`texture-${texture.id}`}
-                    name="texturePreference"
-                    value={texture.id}
-                    checked={responses.texturePreference === texture.id}
-                    onChange={() => handleTextureSelect(texture.id)}
-                    className="visually-hidden"
-                  />
-                  <label 
-                    htmlFor={`texture-${texture.id}`}
-                    className={`texture-button ${responses.texturePreference === texture.id ? 'selected' : ''}`}
-                    aria-label={texture.name}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+            {renderQuestionContent(question)}
+          </section>
+        ))}
 
         <div className="submit-container">
           <button 
             type="submit" 
-            className={`submit-button ${!responses.stylePreference || !responses.texturePreference ? 'disabled' : ''}`}
-            disabled={!responses.stylePreference || !responses.texturePreference}
+            className={`submit-button ${!isFormComplete() ? 'disabled' : ''}`}
+            disabled={!isFormComplete()}
           >
             Submit Responses
           </button>
