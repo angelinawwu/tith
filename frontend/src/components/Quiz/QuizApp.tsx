@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import './QuizStyle.css';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
@@ -26,6 +27,7 @@ const Quiz: React.FC = () => {
       return acc;
     }, {} as QuizResponse)
   );
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,6 +60,50 @@ const Quiz: React.FC = () => {
   // Handle text input for text questions
   const handleTextInput = (questionId: number, value: string) => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
+  };
+
+  // Navigate to the next question
+  const goToNextQuestion = () => {
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  };
+
+  // Navigate to the previous question
+  const goToPreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  // Handle keyboard navigation
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' && !isSubmitDisabled && currentQuestionIndex === quizQuestions.length - 1) {
+      handleSubmit(event as unknown as React.FormEvent);
+    } else if (event.key === 'Enter' && currentQuestionIndex < quizQuestions.length - 1) {
+      goToNextQuestion();
+    }
+  };
+
+  // Check if the current question is answered
+  const isCurrentQuestionAnswered = () => {
+    const currentQuestion = quizQuestions[currentQuestionIndex];
+    const response = responses[currentQuestion.id];
+    
+    if (currentQuestion.type === 'text') {
+      return typeof response === 'string' && response.trim() !== '';
+    } else if (currentQuestion.type === 'multiSelect') {
+      return Array.isArray(response) && response.length > 0;
+    }
+    
+    return response !== null;
+  };
+
+  // Calculate if the next button should be disabled
+  const isNextDisabled = () => {
+    // If the question is required, it must be answered before proceeding
+    const currentQuestion = quizQuestions[currentQuestionIndex];
+    return currentQuestion.required && !isCurrentQuestionAnswered();
   };
 
   // Submit form data to database
@@ -152,6 +198,8 @@ const Quiz: React.FC = () => {
     return Object.entries(responses).every(([questionId, response]) => {
       const question = quizQuestions.find(q => q.id === parseInt(questionId));
       
+      if (!question?.required) return true;
+      
       if (question?.type === 'text') {
         return typeof response === 'string' && response.trim() !== '';
       } else if (question?.type === 'multiSelect') {
@@ -172,6 +220,9 @@ const Quiz: React.FC = () => {
       return response !== null && response !== '';
     });
   };
+
+  // Is the submit button disabled?
+  const isSubmitDisabled = !validateForm() || isSubmitting;
 
   // Render a picture selection question
   const renderPictureSelectionQuestion = (question: Question) => {
@@ -389,38 +440,62 @@ const Quiz: React.FC = () => {
     );
   }
 
+  // Get the current question to display
+  const currentQuestion = quizQuestions[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;
+
   return (
-    <div className="quiz-container">
+    <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
       <h1>Interior Design Style Quiz</h1>
       <form onSubmit={handleSubmit}>
-        {quizQuestions.map((question) => (
-          <section key={question.id} className="question-section">
-            <div className="question-heading">
-              <h2 id={`question-${question.id}`}>
-                <span className="question-number">{question.number}</span>
-              </h2>
-              <p className="question-text">
-                {question.description}
-              </p>
-            </div>
-            {renderQuestionContent(question)}
-          </section>
-        ))}
+        <section className="question-section">
+          <div className="question-heading">
+            <h2 id={`question-${currentQuestion.id}`}>
+              <span className="question-number">{currentQuestion.number}</span>
+            </h2>
+            <p className="question-text">
+              {currentQuestion.description}
+            </p>
+          </div>
+          {renderQuestionContent(currentQuestion)}
+        </section>
 
-        <div className="submit-container">
-          <button 
-            type="submit" 
-            className={`submit-button ${!validateForm() || isSubmitting ? 'disabled' : ''}`}
-            disabled={!validateForm() || isSubmitting}
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit Responses'}
-          </button>
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
+        <div className="navigation-container">
+          {currentQuestionIndex > 0 && (
+            <button 
+              type="button" 
+              className="nav-button prev-button"
+              onClick={goToPreviousQuestion}
+            >
+              Previous
+            </button>
+          )}
+          
+          {!isLastQuestion ? (
+            <button 
+              type="button" 
+              className="nav-button next-button"
+              onClick={goToNextQuestion}
+              disabled={isNextDisabled()}
+            >
+              Next
+            </button>
+          ) : (
+            <button 
+              type="submit" 
+              className={`submit-button ${isSubmitDisabled ? 'disabled' : ''}`}
+              disabled={isSubmitDisabled}
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Responses'}
+            </button>
           )}
         </div>
+        
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
       </form>
     </div>
   );

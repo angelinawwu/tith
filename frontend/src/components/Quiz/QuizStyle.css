@@ -267,14 +267,13 @@
   background-color: var(--color-maroon);
   color: var(--color-white);
   border: none;
-  padding: 1rem 2.5rem;
-  font-size: 1.125rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
   letter-spacing: 0.5px;
-  position: relative;
 }
 
 .submit-button:hover:not(:disabled) {
@@ -598,4 +597,49 @@ button:focus {
 .quiz-container p {
   text-align: center;
   color: #6c757d;
+}
+
+/* Navigation container for single question view */
+.navigation-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding: 0 1rem;
+}
+
+.nav-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.prev-button {
+  background-color: var(--color-white-shadow);
+  color: var(--color-black);
+}
+
+.prev-button:hover {
+  background-color: var(--color-lavender);
+}
+
+.next-button {
+  background-color: var(--color-yellow);
+  color: var(--color-black);
+}
+
+.next-button:hover:not(:disabled) {
+  background-color: var(--color-maroon);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.next-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: var(--color-white-shadow);
 } 
