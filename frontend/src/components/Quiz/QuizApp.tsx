@@ -4,6 +4,7 @@ import './QuizStyle.css';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
 import axios from 'axios';
+import ProgressBar from '../ProgressBar/ProgressBarApp';
 
 interface QuizResponse {
   [key: number]: string | number | number[] | null;
@@ -468,6 +469,9 @@ const Quiz: React.FC = () => {
 
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
+      {/* Use the new ProgressBar component */}
+      <ProgressBar currentStep={currentQuestionIndex} totalSteps={quizQuestions.length} />
+      
       <form onSubmit={handleSubmit}>
         <section 
           ref={questionSectionRef} 

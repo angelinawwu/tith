@@ -1,0 +1,16 @@
+/* Progress bar styles */
+.progress-bar-container {
+  position: fixed;
+  top: 100px; /* Position right below the 100px header */
+  left: 0;
+  width: 100%;
+  height: 8px; /* Slightly thicker */
+  background-color: var(--color-white-shadow);
+  z-index: 900; /* Below header (1000) but above other content */
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--color-yellow);
+  transition: width 0.3s ease;
+} 
