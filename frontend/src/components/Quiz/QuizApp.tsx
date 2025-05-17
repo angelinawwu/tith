@@ -48,8 +48,8 @@ const Quiz: React.FC = () => {
     });
   };
 
-  // Render a style question
-  const renderStyleQuestion = (question: Question) => {
+  // Render a picture selection question (previously style)
+  const renderPictureSelectionQuestion = (question: Question) => {
     return (
       <div className="style-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
         {question.options.map((option) => (
@@ -81,8 +81,8 @@ const Quiz: React.FC = () => {
     );
   };
 
-  // Render a texture question
-  const renderTextureQuestion = (question: Question) => {
+  // Render a scale selection question (previously texture)
+  const renderScaleSelectionQuestion = (question: Question) => {
     return (
       <div className="texture-slider-container">
         <div className="texture-labels">
@@ -150,10 +150,10 @@ const Quiz: React.FC = () => {
   // Render question based on its type
   const renderQuestionContent = (question: Question) => {
     switch (question.type) {
-      case 'style':
-        return renderStyleQuestion(question);
-      case 'texture':
-        return renderTextureQuestion(question);
+      case 'pictureSelection':
+        return renderPictureSelectionQuestion(question);
+      case 'scaleSelection': 
+        return renderScaleSelectionQuestion(question);
       case 'text':
         return renderTextQuestion(question);
       default:

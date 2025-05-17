@@ -1,5 +1,5 @@
 // Question types
-export type QuestionType = 'style' | 'texture' | 'text';
+export type QuestionType = 'pictureSelection' | 'scaleSelection' | 'text';
 
 // Option interface for both question types
 export interface QuestionOption {
@@ -24,7 +24,7 @@ export interface Question {
 const quizQuestions: Question[] = [
   {
     id: 1,
-    type: 'style',
+    type: 'pictureSelection',
     number: 1,
     title: 'Interior Style',
     description: 'Choose the style(s) that best describe your personal preference.',
@@ -36,7 +36,7 @@ const quizQuestions: Question[] = [
   },
   {
     id: 2,
-    type: 'texture',
+    type: 'scaleSelection',
     number: 2,
     title: 'Fabric Texture',
     description: 'What texture do you prefer in cloth?',
