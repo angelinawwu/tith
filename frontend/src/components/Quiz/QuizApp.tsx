@@ -4,13 +4,19 @@ import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
 
 interface QuizResponse {
-  [key: number]: number | null | string;
+  [key: number]: number | null | string | number[];
 }
 
 const Quiz: React.FC = () => {
   const [responses, setResponses] = useState<QuizResponse>(
     quizQuestions.reduce((acc, question) => {
-      acc[question.id] = question.type === 'text' ? '' : null;
+      if (question.type === 'text') {
+        acc[question.id] = '';
+      } else if (question.type === 'multiSelect') {
+        acc[question.id] = [];
+      } else {
+        acc[question.id] = null;
+      }
       return acc;
     }, {} as QuizResponse)
   );
@@ -19,6 +25,26 @@ const Quiz: React.FC = () => {
   // Handle option selection for any question
   const handleOptionSelect = (questionId: number, optionId: number) => {
     setResponses((prev) => ({ ...prev, [questionId]: optionId }));
+  };
+
+  // Handle multi-select option selection
+  const handleMultiSelectOption = (questionId: number, optionId: number) => {
+    setResponses((prev) => {
+      const currentSelections = prev[questionId] as number[] || [];
+      
+      // If option is already selected, remove it; otherwise, add it
+      if (currentSelections.includes(optionId)) {
+        return {
+          ...prev,
+          [questionId]: currentSelections.filter(id => id !== optionId)
+        };
+      } else {
+        return {
+          ...prev,
+          [questionId]: [...currentSelections, optionId]
+        };
+      }
+    });
   };
 
   // Handle text input for text questions
@@ -41,21 +67,26 @@ const Quiz: React.FC = () => {
   const isFormComplete = () => {
     return Object.entries(responses).every(([questionId, response]) => {
       const question = quizQuestions.find(q => q.id === parseInt(questionId));
+      
       if (question?.type === 'text') {
         return typeof response === 'string' && response.trim() !== '';
+      } else if (question?.type === 'multiSelect') {
+        // For multiSelect, check that at least one option is selected
+        return Array.isArray(response) && response.length > 0;
       }
+      
       return response !== null;
     });
   };
 
-  // Render a picture selection question (previously style)
+  // Render a picture selection question
   const renderPictureSelectionQuestion = (question: Question) => {
     return (
-      <div className="style-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
+      <div className="picture-selection-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
         {question.options.map((option) => (
           <div 
             key={option.id}
-            className={`style-option ${responses[question.id] === option.id ? 'selected' : ''}`}
+            className={`picture-selection-option ${responses[question.id] === option.id ? 'selected' : ''}`}
           >
             <input 
               type="radio"
@@ -66,11 +97,11 @@ const Quiz: React.FC = () => {
               onChange={() => handleOptionSelect(question.id, option.id)}
               className="visually-hidden"
             />
-            <label htmlFor={`question-${question.id}-option-${option.id}`} className="style-label">
-              <div className="style-image">
+            <label htmlFor={`question-${question.id}-option-${option.id}`} className="picture-selection-label">
+              <div className="picture-selection-image">
                 <span className="placeholder-text">{option.name}</span>
               </div>
-              <div className="style-info">
+              <div className="picture-selection-info">
                 <h3>{option.name}</h3>
                 {option.description && <p>{option.description}</p>}
               </div>
@@ -81,18 +112,18 @@ const Quiz: React.FC = () => {
     );
   };
 
-  // Render a scale selection question (previously texture)
-  const renderScaleSelectionQuestion = (question: Question) => {
+  // Render a scale selection question
+  const renderScaleQuestion = (question: Question) => {
     return (
-      <div className="texture-slider-container">
-        <div className="texture-labels">
+      <div className="scale-slider-container">
+        <div className="scale-labels">
           {question.options.map((option) => (
             <span key={option.id}>{option.name}</span>
           ))}
         </div>
-        <div className="texture-slider" role="group" aria-labelledby={`question-${question.id}`}>
+        <div className="scale-slider" role="group" aria-labelledby={`question-${question.id}`}>
           {question.options.map((option) => (
-            <div key={option.id} className="texture-option">
+            <div key={option.id} className="scale-option">
               <input
                 type="radio"
                 id={`question-${question.id}-option-${option.id}`}
@@ -104,7 +135,7 @@ const Quiz: React.FC = () => {
               />
               <label 
                 htmlFor={`question-${question.id}-option-${option.id}`}
-                className={`texture-button ${responses[question.id] === option.id ? 'selected' : ''}`}
+                className={`scale-button ${responses[question.id] === option.id ? 'selected' : ''}`}
                 aria-label={option.name}
               />
             </div>
@@ -147,15 +178,107 @@ const Quiz: React.FC = () => {
     );
   };
 
+  // Render a dropdown question
+  const renderDropdownQuestion = (question: Question) => {
+    return (
+      <div className="dropdown-container">
+        <select
+          id={`question-${question.id}`}
+          name={`question-${question.id}`}
+          value={responses[question.id] as number || ""}
+          onChange={(e) => handleOptionSelect(question.id, Number(e.target.value))}
+          className="dropdown-select"
+          required
+          aria-labelledby={`question-${question.id}`}
+        >
+          <option value="" disabled>Please select an option</option>
+          {question.options.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
+  // Render a multi-select question
+  const renderMultiSelectQuestion = (question: Question) => {
+    const selectedOptions = responses[question.id] as number[] || [];
+    
+    return (
+      <div className="multi-select-container">
+        <div className="multi-select-options" role="group" aria-labelledby={`question-${question.id}`}>
+          {question.options.map((option) => (
+            <div key={option.id} className="multi-select-option">
+              <input
+                type="checkbox"
+                id={`question-${question.id}-option-${option.id}`}
+                name={`question-${question.id}`}
+                value={option.id}
+                checked={selectedOptions.includes(option.id)}
+                onChange={() => handleMultiSelectOption(question.id, option.id)}
+                className="multi-select-checkbox"
+              />
+              <label 
+                htmlFor={`question-${question.id}-option-${option.id}`}
+                className="multi-select-label"
+              >
+                <span className="checkmark"></span>
+                <span className="multi-select-label-text">{option.name}</span>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Render a multiple choice question
+  const renderMultipleChoiceQuestion = (question: Question) => {
+    return (
+      <div className="multiple-choice-container">
+        <div className="multiple-choice-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
+          {question.options.map((option) => (
+            <div key={option.id} className="multiple-choice-option">
+              <input
+                type="radio"
+                id={`question-${question.id}-option-${option.id}`}
+                name={`question-${question.id}`}
+                value={option.id}
+                checked={responses[question.id] === option.id}
+                onChange={() => handleOptionSelect(question.id, option.id)}
+                className="multiple-choice-radio"
+              />
+              <label 
+                htmlFor={`question-${question.id}-option-${option.id}`}
+                className="multiple-choice-label"
+              >
+                <span className="radio-mark"></span>
+                <span className="multiple-choice-label-text">{option.name}</span>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // Render question based on its type
   const renderQuestionContent = (question: Question) => {
     switch (question.type) {
       case 'pictureSelection':
         return renderPictureSelectionQuestion(question);
-      case 'scaleSelection': 
-        return renderScaleSelectionQuestion(question);
+      case 'scale': 
+        return renderScaleQuestion(question);
       case 'text':
         return renderTextQuestion(question);
+      case 'dropdown':
+        return renderDropdownQuestion(question);
+      case 'multiSelect':
+        return renderMultiSelectQuestion(question);
+      case 'multipleChoice':
+        return renderMultipleChoiceQuestion(question);
       default:
         return null;
     }

@@ -1,5 +1,5 @@
 // Question types
-export type QuestionType = 'pictureSelection' | 'scaleSelection' | 'text';
+export type QuestionType = 'pictureSelection' | 'scale' | 'text' | 'dropdown' | 'multiSelect' | 'multipleChoice';
 
 // Option interface for both question types
 export interface QuestionOption {
@@ -24,8 +24,70 @@ export interface Question {
 const quizQuestions: Question[] = [
   {
     id: 1,
-    type: 'pictureSelection',
+    type: 'text',
     number: 1,
+    title: 'Name',
+    description: 'Full Name',
+    options: [],
+    placeholder: 'e.g., John Smith',
+    inputType: 'text'
+  },
+  {
+    id: 2,
+    type: 'text',
+    number: 2,
+    title: 'Phone Number',
+    description: 'Phone Number',
+    options: [],
+    placeholder: 'e.g., (555) 123-4567',
+    inputType: 'tel'
+  },
+  {
+    id: 3,
+    type: 'text',
+    number: 3,
+    title: 'Email Address',
+    description: 'Email Address',
+    options: [],
+    placeholder: 'e.g., name@example.com',
+    inputType: 'email'
+  },
+  {
+    id: 4,
+    type: 'multiSelect',
+    number: 4,
+    title: 'Gender',
+    description: 'Gender (select all that apply)',
+    options: [
+      { id: 1, name: 'Male' },
+      { id: 2, name: 'Female' },
+      { id: 3, name: 'Transgender' },
+      { id: 4, name: 'Non-binary' },
+      { id: 5, name: 'Prefer not to say' },
+    ],
+  },
+  {
+    id: 5,
+    type: 'multiSelect',
+    number: 5,
+    title: 'Ethnicity',
+    description: 'Ethnicity (select all that apply)',
+    options: [
+      { id: 1, name: 'Asian' },
+      { id: 2, name: 'Black/African American' },
+      { id: 3, name: 'Latinx/Hispanic' },
+      { id: 4, name: 'Middle Eastern' },
+      { id: 5, name: 'Indigenous/Native American or Alaska Native' },
+      { id: 6, name: 'Native Hawaiian or Other Pacific Islander' },
+      { id: 7, name: 'White' },
+      { id: 8, name: 'Mixed Race' },
+      { id: 9, name: 'Unknown/Prefer not to say' },
+    ],
+  },
+  {
+    id: 12,
+    type: 'pictureSelection',
+    number: 12,
     title: 'Interior Style',
     description: 'Choose the style(s) that best describe your personal preference.',
     options: [
@@ -35,9 +97,9 @@ const quizQuestions: Question[] = [
     ]
   },
   {
-    id: 2,
-    type: 'scaleSelection',
-    number: 2,
+    id: 13,
+    type: 'scale',
+    number: 13,
     title: 'Fabric Texture',
     description: 'What texture do you prefer in cloth?',
     options: [
@@ -47,36 +109,6 @@ const quizQuestions: Question[] = [
       { id: 4, name: 'Slightly Soft' },
       { id: 5, name: 'Soft' },
     ]
-  },
-  {
-    id: 3,
-    type: 'text',
-    number: 3,
-    title: 'Your Name',
-    description: 'Please enter your full name',
-    options: [],
-    placeholder: 'e.g., John Smith',
-    inputType: 'text'
-  },
-  {
-    id: 4,
-    type: 'text',
-    number: 4,
-    title: 'Phone Number',
-    description: 'Please enter your phone number',
-    options: [],
-    placeholder: 'e.g., (555) 123-4567',
-    inputType: 'tel'
-  },
-  {
-    id: 5,
-    type: 'text',
-    number: 5,
-    title: 'Email Address',
-    description: 'Please enter your email address',
-    options: [],
-    placeholder: 'e.g., name@example.com',
-    inputType: 'email'
   }
 ];
 
