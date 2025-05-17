@@ -19,13 +19,18 @@ router.get('/:userId', async (req, res) => {
 // Save partial or complete quiz submission
 router.post('/:userId', validateQuiz, async (req, res) => {
   try {
+    console.log('Received quiz submission for userId:', req.params.userId);
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    
     const userId = req.params.userId;
     const isComplete = req.query.complete === 'true';
     
     let preferences = await DesignPreferences.findOne({ userId });
+    console.log('Existing preferences found:', preferences ? 'Yes' : 'No');
     
     if (preferences) {
       // Update existing preferences
+      console.log('Updating existing preferences');
       Object.assign(preferences, {
         ...preferences.toObject(),
         ...req.body,
@@ -33,6 +38,7 @@ router.post('/:userId', validateQuiz, async (req, res) => {
       });
     } else {
       // Create new preferences
+      console.log('Creating new preferences');
       preferences = new DesignPreferences({
         userId,
         ...req.body,
@@ -40,9 +46,27 @@ router.post('/:userId', validateQuiz, async (req, res) => {
       });
     }
 
-    await preferences.save();
-    res.status(201).json(preferences);
+    console.log('Attempting to save preferences:', JSON.stringify(preferences, null, 2));
+    
+    try {
+      await preferences.save();
+      console.log('Preferences saved successfully');
+      res.status(201).json(preferences);
+    } catch (saveError) {
+      console.error('Error during save operation:', saveError);
+      console.error('Save error details:', {
+        name: saveError.name,
+        message: saveError.message,
+        code: saveError.code,
+        errors: saveError.errors
+      });
+      res.status(400).json({ 
+        message: 'Error saving preferences',
+        details: saveError.message
+      });
+    }
   } catch (error) {
+    console.error('Error in route handler:', error);
     res.status(400).json({ message: error.message });
   }
 });

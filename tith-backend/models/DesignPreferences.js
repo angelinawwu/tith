@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 
 const designPreferencesSchema = new mongoose.Schema({
   userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "User", 
+    type: String,
     required: true 
   },
   status: {
@@ -15,11 +14,11 @@ const designPreferencesSchema = new mongoose.Schema({
     firstName: String,
     lastName: String,
     email: String,
-    phoneNumber: String,
+    phoneNumber: [Number],
   },
   demographics: {
-    gender: String,
-    ethnicity: String,
+    gender: [String],
+    ethnicity: [String],
     householdSize: String,
     fosterCare: Boolean,
     disability: Boolean,
@@ -45,11 +44,7 @@ const designPreferencesSchema = new mongoose.Schema({
     petDetails: String,
   },
   personalInterests: {
-    soothingSounds: [String],
-    relaxationActivities: [String],
-    favoriteMusic: [String],
-    favoriteMovie: String,
-    joySongs: String,
+    roomWords: [String],
   },
   designElements: {
     patternPreference: String,
@@ -82,4 +77,5 @@ designPreferencesSchema.pre('save', function(next) {
   next();
 });
 
-module.exports = mongoose.model("DesignPreferences", designPreferencesSchema); 
+module.exports = mongoose.model("Tith", designPreferencesSchema); 
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/UserResponses1')
