@@ -1,4 +1,19 @@
-// src/quizConfig.js
+/**
+ * Original quiz configuration from the initial implementation
+ * Backed up on: ${new Date().toISOString()}
+ * 
+ * This file contains the original detailed questionnaire for user preferences.
+ * It includes questions about:
+ * - Personal information
+ * - Demographics
+ * - Style preferences
+ * - Color preferences
+ * - Comfort factors
+ * - Environmental preferences
+ * - Personal interests
+ */
+
+// Original quiz configuration
 export const quizConfig = [
     {
       id: "firstName",
@@ -214,5 +229,4 @@ export const quizConfig = [
       label: "Anything else you'd like to share?",
       type: "textarea"
     }
-  ];
-  
+  ]; 
