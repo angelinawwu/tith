@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import type { FC } from 'react';
 import axios from 'axios';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
+import DesignGenerator from '../DesignGenerator/DesignGenerator';
 import './QuizStyle.css';
 
 // Type for tracking quiz responses
 
-const Quiz: FC = () => {
+const Quiz = () => {
   const [responses, setResponses] = useState<Record<number, string | number | number[] | null>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedData, setSubmittedData] = useState<Record<string, any> | null>(null);
+  const [showResponses, setShowResponses] = useState(false);
+  const [showDesignGenerator, setShowDesignGenerator] = useState(false);
 
   useEffect(() => {
     const initialResponses: Record<number, string | number | number[] | null> = {};
@@ -121,13 +125,17 @@ const Quiz: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // Prevent multiple submissions
+    
     setIsSubmitting(true);
-    const cleanValue = <T,>(value: T): T | string | undefined => {
-      if (value === null || value === undefined) return undefined;
-      if (typeof value === 'string') return value.trim() || undefined;
-      if (Array.isArray(value)) return value.length > 0 ? value : undefined;
-      return value;
-    };
+    
+    try {
+      const cleanValue = <T,>(value: T): T | string | undefined => {
+        if (value === null || value === undefined) return undefined;
+        if (typeof value === 'string') return value.trim() || undefined;
+        if (Array.isArray(value)) return value.length > 0 ? value : undefined;
+        return value;
+      };
 
     const formData: Record<string, unknown> = {};
     
@@ -183,15 +191,14 @@ const Quiz: FC = () => {
       formData.additionalNotes = cleanValue(responses[28]);
     }
     
-    const cleanedData = JSON.parse(JSON.stringify(formData, (_, value) => 
-      value === null || value === undefined || value === '' || 
-      (Array.isArray(value) && value.length === 0) ||
-      (typeof value === 'object' && value !== null && Object.keys(value).length === 0) ? undefined : value
-    ));
+      const cleanedData = JSON.parse(JSON.stringify(formData, (_, value) => 
+        value === null || value === undefined || value === '' || 
+        (Array.isArray(value) && value.length === 0) ||
+        (typeof value === 'object' && value !== null && Object.keys(value).length === 0) ? undefined : value
+      ));
 
-    console.log('Submitting form with data:', cleanedData);
-    
-    try {
+      console.log('Submitting form with data:', cleanedData);
+      
       const response = await axios.post(
         `http://localhost:5001/api/design-preferences/mock-user-id`,
         cleanedData,
@@ -199,7 +206,8 @@ const Quiz: FC = () => {
           params: { complete: 'true' },
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          timeout: 10000 // 10 second timeout
         }
       );
 
@@ -207,13 +215,18 @@ const Quiz: FC = () => {
       
       if (response.data) {
         console.log('Form submitted successfully');
+        setSubmittedData(cleanedData);
+        setIsSubmitted(true);
       }
       
       return response.data;
     } catch (err) {
       console.error('Error submitting form:', err);
-      // Just log the error, don't block submission
-      return { error: 'Submission completed with warnings' };
+      // Show error to user
+      alert('There was an error submitting your form. Please try again.');
+      return { error: 'Submission failed' };
+    } finally {
+      setIsSubmitting(false); // Always reset submitting state
     }
   };
 
@@ -429,7 +442,49 @@ const Quiz: FC = () => {
       default:
         return null;
     }
-  };
+  }
+
+  // If form is submitted, show success message
+  if (isSubmitted && submittedData) {
+    if (showDesignGenerator) {
+      return (
+        <DesignGenerator 
+          quizResponses={submittedData} 
+          onBack={() => setShowDesignGenerator(false)}
+        />
+      );
+    }
+
+    return (
+      <div className="quiz-complete">
+        <h2>Thank you for completing the quiz!</h2>
+        <p>Your responses have been recorded.</p>
+        
+        <div className="action-buttons">
+          <button 
+            onClick={() => setShowResponses(!showResponses)} 
+            className="btn"
+          >
+            {showResponses ? 'Hide My Responses' : 'View My Responses'}
+          </button>
+          
+          <button
+            onClick={() => setShowDesignGenerator(true)}
+            className="btn btn-primary"
+          >
+            Generate My Interior Design
+          </button>
+        </div>
+        
+        {showResponses && (
+          <div className="responses-summary">
+            <h3>Your Responses:</h3>
+            <pre>{JSON.stringify(submittedData, null, 2)}</pre>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;
@@ -437,7 +492,7 @@ const Quiz: FC = () => {
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
       <h1>Interior Design Style Quiz</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="quiz-form">
         <section className="question-section">
           <div className="question-heading">
             <h2 id={`question-${currentQuestion.id}`}>

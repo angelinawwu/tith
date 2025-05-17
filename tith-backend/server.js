@@ -38,14 +38,25 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/UserRespo
   process.exit(1);
 });
 
-// Routes
+// Import routes
 const designPreferencesRoutes = require('./routes/designPreferences');
 const recommendationsRoutes = require('./routes/recommendations');
 const styleQuizRoutes = require('./routes/styleQuiz');
+const designController = require('./controllers/designController');
+const designGenerationController = require('./controllers/designGenerationController');
 
+// API Routes
 app.use('/api/design-preferences', designPreferencesRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/style-quiz', styleQuizRoutes);
+
+// Design generation endpoints
+app.post('/api/v1/designs/generate', designGenerationController.generateDesign);
+app.get('/api/v1/designs/:designId/recommendations', designGenerationController.getDesignRecommendations);
+
+// Legacy endpoints (to be deprecated)
+app.post('/api/generate-design', designController.generateDesign);
+app.get('/api/design-recommendations', designController.getDesignRecommendations);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
