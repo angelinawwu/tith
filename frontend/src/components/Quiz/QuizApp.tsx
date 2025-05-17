@@ -305,11 +305,11 @@ const Quiz: React.FC = () => {
     const getPlaceholderText = () => {
       switch (question.inputType) {
         case 'tel':
-          return 'e.g., (555) 123-4567';
+          return 'ex: (555) 123-4567';
         case 'email':
-          return 'e.g., name@example.com';
+          return 'ex: name@example.com';
         case 'name':
-          return 'e.g., John Smith';
+          return 'ex: John Smith';
         default:
           return '';
       }
@@ -469,15 +469,14 @@ const Quiz: React.FC = () => {
         </section>
 
         <div className="navigation-container">
-          {currentQuestionIndex > 0 && (
-            <button 
-              type="button" 
-              className="nav-button prev-button"
-              onClick={goToPreviousQuestion}
-            >
-              Previous
-            </button>
-          )}
+          <button 
+            type="button" 
+            className="nav-button prev-button"
+            onClick={goToPreviousQuestion}
+            disabled={currentQuestionIndex === 0}
+          >
+            Previous
+          </button>
           
           {!isLastQuestion ? (
             <button 
