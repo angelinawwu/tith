@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './QuizStyle.css';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
+import axios from 'axios';
 
 interface QuizResponse {
   [key: number]: number | null | string | number[];
@@ -53,14 +54,87 @@ const Quiz: React.FC = () => {
   };
 
   // Submit form data to database
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically send the data to your backend
-    console.log('Submitting responses:', responses);
-    
-    // Simulate successful submission
-    setSubmitted(true);
+    try {
+      // Helper function to get option text from ID
+      const getOptionText = (questionId: number, optionId: number): string => {
+        const question = quizQuestions.find(q => q.id === questionId);
+        const option = question?.options.find(o => o.id === optionId);
+        return option?.name || '';
+      };
+
+      const getMultipleOptionTexts = (questionId: number, optionIds: number[]): string[] => {
+        return optionIds.map(id => getOptionText(questionId, id));
+      };
+
+      const response = await axios.post('http://localhost:5000/api/design-preferences/mock-user-id', {
+        personalInfo: {
+          // Map responses to match backend schema
+          firstName: responses[1] as string,
+          lastName: responses[2] as string,
+          email: responses[3] as string,
+          phoneNumber: responses[4] as string,
+        },
+        demographics: {
+          gender: getMultipleOptionTexts(4, responses[4] as number[]),
+          ethnicity: getMultipleOptionTexts(5, responses[5] as number[]),
+          householdSize: getOptionText(6, responses[6] as number),
+          fosterCare: responses[7] === 1,
+          disability: responses[8] === 1,
+          disabilityDetails: responses[9] as string,
+        },
+        stylePreferences: {
+          homeMessage: getMultipleOptionTexts(11, responses[11] as number[]),
+          favoriteColors: getMultipleOptionTexts(11, responses[11] as number[]),
+          styleInWords: responses[12] as string,
+          styleAdmired: responses[13] as string,
+        },
+        comfortFactors: {
+          peacePlace: responses[14] as string,
+          peaceScent: getMultipleOptionTexts(15, responses[15] as number[]),
+          fabrics: getMultipleOptionTexts(16, responses[16] as number[]),
+          calmColors: getMultipleOptionTexts(17, responses[17] as number[]),
+        },
+        environmentalPreferences: {
+          artTypes: getMultipleOptionTexts(18, responses[18] as number[]),
+          allergies: responses[19] === 1,
+          allergyDetails: responses[20] as string,
+          pets: responses[21] === 1,
+          petDetails: responses[22] as string,
+        },
+        personalInterests: {
+          roomWords: getMultipleOptionTexts(23, responses[23] as number[]),
+        },
+        designElements: {
+          patternPreference: responses[24] as string,
+          patternTypes: getMultipleOptionTexts(25, responses[25] as number[]),
+          roomWords: getMultipleOptionTexts(26, responses[26] as number[]),
+        },
+        generatedPreferences: {
+          colorPalette: [], // sample color palette: [[255, 255, 255], [0, 0, 0]]
+          moodboardImageUrl: '',
+          suggestedFurniture: [] // sample suggested furniture: [{ name: 'Sofa', style: 'Modern', image: 'https://example.com/image.jpg' }]
+        },
+
+        additionalNotes: responses[27] as string,
+      };
+
+      // Send formatted responses to backend
+      }, {
+        params: {
+          complete: 'true'
+        }
+      });
+
+      if (response.status === 201) {
+        setSubmitted(true);
+      }
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      // Add proper error handling UI
+    }
   };
 
   // Check if all questions have been answered
