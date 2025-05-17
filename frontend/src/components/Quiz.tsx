@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './QuizStyle.css';
+import './Quiz.css';
 
 interface QuizResponse {
   stylePreference: number | null;
@@ -84,7 +84,7 @@ const Quiz: React.FC = () => {
                   className="visually-hidden"
                 />
                 <label htmlFor={`style-${style.id}`} className="style-label">
-                  <div className="style-image">
+                  <div className="style-image placeholder-image">
                     {/* Placeholder for style images */}
                     <span className="placeholder-text">{style.name}</span>
                   </div>
@@ -106,7 +106,7 @@ const Quiz: React.FC = () => {
           <div className="texture-slider-container">
             <div className="texture-labels">
               {textureOptions.map((texture) => (
-                <span key={texture.id}>{texture.name}</span>
+                <span key={texture.id} className="texture-label">{texture.name}</span>
               ))}
             </div>
             <div className="texture-slider" role="group" aria-labelledby="texture-question">
@@ -135,7 +135,7 @@ const Quiz: React.FC = () => {
         <div className="submit-container">
           <button 
             type="submit" 
-            className={`submit-button ${!responses.stylePreference || !responses.texturePreference ? 'disabled' : ''}`}
+            className="submit-button"
             disabled={!responses.stylePreference || !responses.texturePreference}
           >
             Submit Responses

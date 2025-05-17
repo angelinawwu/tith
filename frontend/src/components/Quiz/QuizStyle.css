@@ -1,0 +1,164 @@
+/* Quiz component styles */
+
+.quiz-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--color-maroon);
+}
+
+.question-section {
+  margin-bottom: 2.5rem;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: var(--color-white);
+  box-shadow: 0 2px 8px var(--color-white-shadow);
+}
+
+.question-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--color-yellow);
+  color: var(--color-white);
+  border-radius: 50%;
+  margin-right: 0.75rem;
+  font-size: 1rem;
+}
+
+.style-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.style-option {
+  border: 2px solid var(--color-white-shadow);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.style-option.selected {
+  border-color: var(--color-yellow);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.style-label {
+  cursor: pointer;
+  display: block;
+}
+
+.style-image {
+  height: 150px;
+  background-color: var(--color-turquoise);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-text {
+  color: var(--color-maroon);
+  font-weight: 500;
+}
+
+.style-info {
+  padding: 1rem;
+}
+
+.style-info h3 {
+  margin: 0 0 0.5rem;
+  color: var(--color-maroon);
+}
+
+.style-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-black);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.texture-slider-container {
+  margin-top: 1.5rem;
+}
+
+.texture-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-black);
+}
+
+.texture-slider {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--color-lavender);
+  height: 4rem;
+  border-radius: 2rem;
+  position: relative;
+  margin: 1rem 0;
+}
+
+.texture-option {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.texture-button {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: var(--color-white-shadow);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.texture-button.selected {
+  background-color: var(--color-yellow);
+  transform: scale(1.2);
+}
+
+.submit-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.submit-button {
+  background-color: var(--color-maroon);
+  color: var(--color-white);
+  border: none;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: var(--color-yellow);
+  color: var(--color-black);
+}
+
+.submit-button:disabled {
+  background-color: var(--color-white-shadow);
+  cursor: not-allowed;
+} 

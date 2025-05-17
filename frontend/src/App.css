@@ -1,3 +1,15 @@
+/* Color Variables */
+:root {
+  --color-maroon: #640A09;
+  --color-lavender: #E1C2CE;
+  --color-yellow: #BF9526;
+  --color-turquoise: #DDEDE2;
+  --color-light: #F0F8E2;
+  --color-white-shadow: #CCCEC8;
+  --color-white: #F9F0E3;
+  --color-black: #1D1D1D;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -38,5 +50,6 @@
 }
 
 .read-the-docs {
-  color: #888;
+  color: var(--color-neutral-dark);
 }
+
