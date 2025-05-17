@@ -18,6 +18,7 @@ export interface Question {
   options: QuestionOption[];
   placeholder?: string;
   inputType?: string;
+  required?: boolean;
 }
 
 // Quiz questions data
