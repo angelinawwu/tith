@@ -5,6 +5,8 @@ import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface QuizResponse {
   [key: number]: string | number | number[] | null;
 }
@@ -181,10 +183,16 @@ const Quiz: React.FC = () => {
       
       console.log('Sending request to backend:', requestData);
       
+      // Generate a random userId for each submission
+      const randomUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+      const finalPayload = {
+        userId: randomUserId,
+        responses: responses // Send the raw responses object
+      };
+      console.log("Final payload:", finalPayload);
       const response: ApiResponse = await axios.post(
-        'http://localhost:5001/api/design-preferences/mock-user-id',
-        requestData,
-        { params: { complete: 'true' } }
+        `${API_URL}/api/style-quiz/submit`,
+        finalPayload
       );
 
       console.log('Backend response:', response);
@@ -231,7 +239,7 @@ const Quiz: React.FC = () => {
   };
 
   // Is the submit button disabled?
-  const isSubmitDisabled = !validateForm() || isSubmitting;
+  const isSubmitDisabled = isSubmitting;
 
   // Render a picture selection question
   const renderPictureSelectionQuestion = (question: Question) => {
