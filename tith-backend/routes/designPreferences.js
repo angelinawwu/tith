@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const DesignPreferences = require('../models/DesignPreferences');
+const validateQuiz = require('../middleware/validateQuiz');
 
 // Get design preferences for a user
 router.get('/:userId', async (req, res) => {
@@ -15,34 +16,50 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
-// Create or update design preferences
-router.post('/', async (req, res) => {
+// Save partial or complete quiz submission
+router.post('/:userId', validateQuiz, async (req, res) => {
   try {
-    const { userId, quizAnswers, colorPalette, moodboardImageUrl, suggestedFurniture } = req.body;
+    const userId = req.params.userId;
+    const isComplete = req.query.complete === 'true';
     
     let preferences = await DesignPreferences.findOne({ userId });
     
     if (preferences) {
       // Update existing preferences
-      preferences.quizAnswers = quizAnswers || preferences.quizAnswers;
-      preferences.colorPalette = colorPalette || preferences.colorPalette;
-      preferences.moodboardImageUrl = moodboardImageUrl || preferences.moodboardImageUrl;
-      preferences.suggestedFurniture = suggestedFurniture || preferences.suggestedFurniture;
-      
-      await preferences.save();
+      Object.assign(preferences, {
+        ...preferences.toObject(),
+        ...req.body,
+        status: isComplete ? 'completed' : 'draft'
+      });
     } else {
       // Create new preferences
       preferences = new DesignPreferences({
         userId,
-        quizAnswers,
-        colorPalette,
-        moodboardImageUrl,
-        suggestedFurniture
+        ...req.body,
+        status: isComplete ? 'completed' : 'draft'
       });
-      await preferences.save();
     }
-    
+
+    await preferences.save();
     res.status(201).json(preferences);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Update specific section of preferences
+router.patch('/:userId/:section', async (req, res) => {
+  try {
+    const { userId, section } = req.params;
+    const update = { [section]: req.body };
+    
+    const preferences = await DesignPreferences.findOneAndUpdate(
+      { userId },
+      { $set: update },
+      { new: true, upsert: true }
+    );
+
+    res.json(preferences);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
