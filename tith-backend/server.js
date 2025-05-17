@@ -19,7 +19,10 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tith', {
 
 // Routes
 const designPreferencesRoutes = require('./routes/designPreferences');
+const recommendationsRoutes = require('./routes/recommendations');
+
 app.use('/api/design-preferences', designPreferencesRoutes);
+app.use('/api/recommendations', recommendationsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
