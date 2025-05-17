@@ -1,18 +1,16 @@
 /* Quiz component styles */
 .quiz-container {
   width: 100%;
-  height: auto;
+  min-height: calc(100vh - 100px); /* Full height minus header */
   max-width: 1000px;
-  min-width: 320px;
-  margin: 120px auto 0; /* Added top margin to account for header */
-  padding: 0 15px;
+  margin: 0 auto;
+  padding: 1rem 15px;
   box-sizing: border-box;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--color-white);
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
-
 @media (min-width: 768px) {
   .quiz-container {
     width: 80%;
@@ -26,14 +24,11 @@
 }
 
 .question-section {
+  flex-grow: 1; /* Takes remaining space */
   margin-bottom: 2rem;
   border-radius: 12px;
   padding: 1rem 2rem;
   background-color: var(--color-white);
-  position: relative;
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.3s ease, transform 0.3s ease;
   width: 100%;
   box-sizing: border-box;
 }
@@ -70,7 +65,8 @@
   flex-direction: row;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0;
+  width: 100%;
+  margin-bottom: 1rem; /* Consistent margin */
 }
 
 .question-number {

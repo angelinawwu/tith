@@ -3,9 +3,11 @@ import Header from '../components/Header/HeaderApp';
 
 const Quiz = () => {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen w-full bg-white">
       <Header />
-      <QuizApp />
+      <main className="flex-grow w-full overflow-y-auto">
+        <QuizApp />
+      </main>
     </div>
   );
 };

@@ -8,13 +8,8 @@
     width: 100%;
     background-color: var(--color-maroon);
     color: var(--color-white);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    box-sizing: border-box; /* Add this to include padding in height */
-  }
+    box-sizing: border-box;
+}
 
 .header-title {
   font-size: 2rem;

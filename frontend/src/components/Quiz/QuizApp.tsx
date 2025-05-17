@@ -455,7 +455,6 @@ const Quiz: React.FC = () => {
 
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
-      <h1>Interior Design Style Quiz</h1>
       <form onSubmit={handleSubmit}>
         <section className="question-section">
           <div className="question-heading">
