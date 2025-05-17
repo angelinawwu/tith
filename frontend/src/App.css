@@ -2,6 +2,7 @@
 :root {
   --color-maroon: #640A09;
   --color-lavender: #E1C2CE;
+  --color-lavender-dark: #C098BA;
   --color-yellow: #BF9526;
   --color-turquoise: #DDEDE2;
   --color-light: #F0F8E2;
@@ -11,10 +12,20 @@
 }
 
 #root {
-  max-width: 1280px;
+  width: 100%;
+  height: 100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100vw;
+  padding-top: 1rem; /* Matches header height */
+  padding-bottom: 2rem; /* Matches header height */
+  box-sizing: border-box;
 }
 
 .logo {
@@ -52,4 +63,3 @@
 .read-the-docs {
   color: var(--color-neutral-dark);
 }
-

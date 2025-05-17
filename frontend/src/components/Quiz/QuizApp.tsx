@@ -468,7 +468,6 @@ const Quiz: React.FC = () => {
 
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
-      <h1>Interior Design Style Quiz</h1>
       <form onSubmit={handleSubmit}>
         <section 
           ref={questionSectionRef} 
@@ -486,16 +485,15 @@ const Quiz: React.FC = () => {
         </section>
 
         <div className="navigation-container">
-          {currentQuestionIndex > 0 && (
-            <button 
-              type="button" 
-              className="nav-button prev-button"
-              onClick={goToPreviousQuestion}
-              disabled={isTransitioning}
-            >
-              Previous
-            </button>
-          )}
+          {/* Always show the previous button but disable it on first question */}
+          <button 
+            type="button" 
+            className="nav-button prev-button"
+            onClick={goToPreviousQuestion}
+            disabled={currentQuestionIndex === 0 || isTransitioning}
+          >
+            Previous
+          </button>
           
           {!isLastQuestion ? (
             <button 

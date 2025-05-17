@@ -1,15 +1,28 @@
 /* Quiz component styles */
-
 .quiz-container {
   width: 100%;
+  height: auto;
   max-width: 1000px;
-  margin: 0 auto;
-  justify-content: center;
+  min-width: 320px;
+  margin: 120px auto 0; /* Added top margin to account for header */
+  padding: 0 15px;
+  box-sizing: border-box;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--color-white);
   position: relative;
   overflow: hidden;
-  /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); */
+}
+
+@media (min-width: 768px) {
+  .quiz-container {
+    width: 80%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .quiz-container {
+    width: 1000px;
+  }
 }
 
 .question-section {
@@ -17,12 +30,12 @@
   border-radius: 12px;
   padding: 1rem 2rem;
   background-color: var(--color-white);
-  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
-  /* transition: transform 0.2s ease, box-shadow 0.2s ease; */
   position: relative;
   opacity: 1;
   transform: translateY(0);
   transition: opacity 0.3s ease, transform 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Question transition animations */
@@ -646,12 +659,24 @@ button:focus {
 }
 
 .prev-button {
-  background-color: var(--color-white-shadow);
+  background-color: var(--color-lavender);
   color: var(--color-black);
 }
 
-.prev-button:hover {
-  background-color: var(--color-lavender);
+.prev-button:hover:not(:disabled) {
+  background-color: var(--color-maroon);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.prev-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #cccccc; /* Grey color */
+  color: #666666;
+  transform: none;
+  box-shadow: none;
 }
 
 .next-button {
