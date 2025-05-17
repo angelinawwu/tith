@@ -7,6 +7,8 @@
   justify-content: center;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--color-white);
+  position: relative;
+  overflow: hidden;
   /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); */
 }
 
@@ -17,12 +19,38 @@
   background-color: var(--color-white);
   /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
   /* transition: transform 0.2s ease, box-shadow 0.2s ease; */
+  position: relative;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-/* 
-.question-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-} */
+
+/* Question transition animations */
+.question-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.question-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.question-exit {
+  opacity: 1;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+  transform: translateY(0);
+}
+
+.question-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
 
 .question-heading {
   display: flex;

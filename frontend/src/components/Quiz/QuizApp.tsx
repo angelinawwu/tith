@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import './QuizStyle.css';
 import quizQuestions from './QuizQuestions';
@@ -28,6 +28,9 @@ const Quiz: React.FC = () => {
     }, {} as QuizResponse)
   );
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
+  const questionSectionRef = useRef<HTMLElement>(null);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,17 +65,50 @@ const Quiz: React.FC = () => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
-  // Navigate to the next question
+  // Navigate to the next question with transition
+  const animateQuestionTransition = (newIndex: number, direction: 'next' | 'prev') => {
+    setTransitionDirection(direction);
+    setIsTransitioning(true);
+    
+    // Add exit animation classes
+    if (questionSectionRef.current) {
+      questionSectionRef.current.classList.add('question-exit', 'question-exit-active');
+    }
+  
+    setTimeout(() => {
+      setCurrentQuestionIndex(newIndex);
+      
+      // Remove exit classes and add enter classes
+      if (questionSectionRef.current) {
+        questionSectionRef.current.classList.remove('question-exit', 'question-exit-active');
+        questionSectionRef.current.classList.add('question-enter');
+        
+        // Force reflow to ensure the enter animation plays
+        void questionSectionRef.current.offsetHeight;
+        
+        // Start enter animation
+        questionSectionRef.current.classList.add('question-enter-active');
+        
+        // Clean up after animation completes
+        setTimeout(() => {
+          if (questionSectionRef.current) {
+            questionSectionRef.current.classList.remove('question-enter', 'question-enter-active');
+            setIsTransitioning(false);
+          }
+        }, 300);
+      }
+    }, 300);
+  };
+  
   const goToNextQuestion = () => {
-    if (currentQuestionIndex < quizQuestions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+    if (currentQuestionIndex < quizQuestions.length - 1 && !isTransitioning) {
+      animateQuestionTransition(currentQuestionIndex + 1, 'next');
     }
   };
-
-  // Navigate to the previous question
+  
   const goToPreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+    if (currentQuestionIndex > 0 && !isTransitioning) {
+      animateQuestionTransition(currentQuestionIndex - 1, 'prev');
     }
   };
 
@@ -80,7 +116,7 @@ const Quiz: React.FC = () => {
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' && !isSubmitDisabled && currentQuestionIndex === quizQuestions.length - 1) {
       handleSubmit(event as unknown as React.FormEvent);
-    } else if (event.key === 'Enter' && currentQuestionIndex < quizQuestions.length - 1) {
+    } else if (event.key === 'Enter' && currentQuestionIndex < quizQuestions.length - 1 && !isTransitioning) {
       goToNextQuestion();
     }
   };
@@ -434,7 +470,10 @@ const Quiz: React.FC = () => {
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
       <h1>Interior Design Style Quiz</h1>
       <form onSubmit={handleSubmit}>
-        <section className="question-section">
+        <section 
+          ref={questionSectionRef} 
+          className={`question-section ${isTransitioning ? 'question-enter' : ''}`}
+        >
           <div className="question-heading">
             <h2 id={`question-${currentQuestion.id}`}>
               <span className="question-number">{currentQuestion.number}</span>
@@ -452,6 +491,7 @@ const Quiz: React.FC = () => {
               type="button" 
               className="nav-button prev-button"
               onClick={goToPreviousQuestion}
+              disabled={isTransitioning}
             >
               Previous
             </button>
@@ -462,7 +502,7 @@ const Quiz: React.FC = () => {
               type="button" 
               className="nav-button next-button"
               onClick={goToNextQuestion}
-              disabled={isNextDisabled()}
+              disabled={isNextDisabled() || isTransitioning}
             >
               Next
             </button>
