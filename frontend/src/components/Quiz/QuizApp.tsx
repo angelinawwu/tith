@@ -1,10 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import './QuizStyle.css';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
 import axios from 'axios';
-import ProgressBar from '../ProgressBar/ProgressBarApp';
 
 interface QuizResponse {
   [key: number]: string | number | number[] | null;
@@ -29,9 +28,6 @@ const Quiz: React.FC = () => {
     }, {} as QuizResponse)
   );
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
-  const questionSectionRef = useRef<HTMLElement>(null);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,50 +62,17 @@ const Quiz: React.FC = () => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
-  // Navigate to the next question with transition
-  const animateQuestionTransition = (newIndex: number, direction: 'next' | 'prev') => {
-    setTransitionDirection(direction);
-    setIsTransitioning(true);
-    
-    // Add exit animation classes
-    if (questionSectionRef.current) {
-      questionSectionRef.current.classList.add('question-exit', 'question-exit-active');
-    }
-  
-    setTimeout(() => {
-      setCurrentQuestionIndex(newIndex);
-      
-      // Remove exit classes and add enter classes
-      if (questionSectionRef.current) {
-        questionSectionRef.current.classList.remove('question-exit', 'question-exit-active');
-        questionSectionRef.current.classList.add('question-enter');
-        
-        // Force reflow to ensure the enter animation plays
-        void questionSectionRef.current.offsetHeight;
-        
-        // Start enter animation
-        questionSectionRef.current.classList.add('question-enter-active');
-        
-        // Clean up after animation completes
-        setTimeout(() => {
-          if (questionSectionRef.current) {
-            questionSectionRef.current.classList.remove('question-enter', 'question-enter-active');
-            setIsTransitioning(false);
-          }
-        }, 300);
-      }
-    }, 300);
-  };
-  
+  // Navigate to the next question
   const goToNextQuestion = () => {
-    if (currentQuestionIndex < quizQuestions.length - 1 && !isTransitioning) {
-      animateQuestionTransition(currentQuestionIndex + 1, 'next');
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
     }
   };
-  
+
+  // Navigate to the previous question
   const goToPreviousQuestion = () => {
-    if (currentQuestionIndex > 0 && !isTransitioning) {
-      animateQuestionTransition(currentQuestionIndex - 1, 'prev');
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
     }
   };
 
@@ -117,7 +80,7 @@ const Quiz: React.FC = () => {
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' && !isSubmitDisabled && currentQuestionIndex === quizQuestions.length - 1) {
       handleSubmit(event as unknown as React.FormEvent);
-    } else if (event.key === 'Enter' && currentQuestionIndex < quizQuestions.length - 1 && !isTransitioning) {
+    } else if (event.key === 'Enter' && currentQuestionIndex < quizQuestions.length - 1) {
       goToNextQuestion();
     }
   };
@@ -168,52 +131,52 @@ const Quiz: React.FC = () => {
 
       const requestData = {
         personalInfo: {
-          firstName: responses[1] as string,
-          lastName: responses[2] as string,
-          email: responses[3] as string,
-          phoneNumber: responses[4] as string,
+          firstName: String(responses[1] || '').trim().split(' ')[0] || '',
+          lastName: String(responses[1] || '').trim().split(' ').slice(1).join(' ') || '',
+          phoneNumber: String(responses[2] || '').trim() || '',
+          email: String(responses[3] || '').trim() || ''
         },
         demographics: {
-          gender: getMultipleOptionTexts(4, responses[4] as number[]),
-          ethnicity: getMultipleOptionTexts(5, responses[5] as number[]),
-          householdSize: getOptionText(6, responses[6] as number),
+          gender: getMultipleOptionTexts(4, responses[4] as number[]) || [],
+          ethnicity: getMultipleOptionTexts(5, responses[5] as number[]) || [],
+          householdSize: String(getOptionText(6, responses[6] as number) || '').trim() || '',
           fosterCare: responses[7] === 1,
           disability: responses[8] === 1,
-          disabilityDetails: responses[9] as string,
+          disabilityDetails: String(responses[9] || '').trim() || '',
         },
         stylePreferences: {
-          homeMessage: getMultipleOptionTexts(10, responses[10] as number[]),
-          favoriteColors: getMultipleOptionTexts(11, responses[11] as number[]),
-          styleInWords: responses[12] as string,
-          styleAdmired: responses[13] as string,
+          homeMessage: getMultipleOptionTexts(10, responses[10] as number[]) || [],
+          favoriteColors: getMultipleOptionTexts(11, responses[11] as number[]) || [],
+          styleInWords: String(responses[12] || '').trim() || '',
+          styleAdmired: String(responses[13] || '').trim() || '',
         },
         comfortFactors: {
-          peacePlace: responses[14] as string,
-          peaceScent: getMultipleOptionTexts(15, responses[15] as number[]),
-          fabrics: getMultipleOptionTexts(16, responses[16] as number[]),
-          calmColors: getMultipleOptionTexts(17, responses[17] as number[]),
+          peacePlace: String(responses[14] || '').trim() || '',
+          peaceScent: getMultipleOptionTexts(15, responses[15] as number[]) || [],
+          fabrics: getMultipleOptionTexts(16, responses[16] as number[]) || [],
+          calmColors: getMultipleOptionTexts(17, responses[17] as number[]) || [],
         },
         environmentalPreferences: {
-          artTypes: getMultipleOptionTexts(18, responses[18] as number[]),
+          artTypes: getMultipleOptionTexts(18, responses[18] as number[]) || [],
           allergies: responses[19] === 1,
-          allergyDetails: responses[20] as string,
+          allergyDetails: String(responses[20] || '').trim() || '',
           pets: responses[21] === 1,
-          petDetails: responses[22] as string,
+          petDetails: String(responses[22] || '').trim() || '',
         },
         personalInterests: {
-          roomWords: getMultipleOptionTexts(23, responses[23] as number[]),
+          roomWords: getMultipleOptionTexts(23, responses[23] as number[]) || [],
         },
         designElements: {
-          patternPreference: responses[24] as string,
-          patternTypes: getMultipleOptionTexts(25, responses[25] as number[]),
-          roomWords: getMultipleOptionTexts(26, responses[26] as number[]),
+          patternPreference: String(responses[24] || '').trim() || '',
+          patternTypes: getMultipleOptionTexts(25, responses[25] as number[]) || [],
+          roomWords: getMultipleOptionTexts(26, responses[26] as number[]) || [],
         },
         generatedPreferences: {
           colorPalette: [], // Will be generated by backend
           moodboardImageUrl: '', // Will be generated by backend
           suggestedFurniture: [] // Will be generated by backend
         },
-        additionalNotes: responses[27] as string,
+        additionalNotes: String(responses[28] || '').trim() || '',
       };
       
       console.log('Sending request to backend:', requestData);
@@ -243,6 +206,20 @@ const Quiz: React.FC = () => {
   };
 
   const validateForm = (): boolean => {
+    // Check required personal info fields
+    const fullName = (responses[1] as string)?.trim() || '';
+    const email = responses[3] as string;
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = email && email.trim() !== '' && emailRegex.test(email);
+    
+    // Check if required fields are filled
+    if (!fullName || fullName.split(' ').length < 2 || !isEmailValid) {
+      return false;
+    }
+
+    // Check other required questions
     const requiredQuestions = quizQuestions.filter(q => q.required);
     return requiredQuestions.every(question => {
       const response = responses[question.id];
@@ -349,7 +326,7 @@ const Quiz: React.FC = () => {
             onChange={(e) => handleTextInput(question.id, e.target.value)}
             className="text-input"
             placeholder={getPlaceholderText()}
-            required
+            required={question.id === 3}
             aria-label={question.placeholder}
           />
         </div>
@@ -478,14 +455,9 @@ const Quiz: React.FC = () => {
 
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
-      {/* Use the new ProgressBar component */}
-      <ProgressBar currentStep={currentQuestionIndex} totalSteps={quizQuestions.length} />
-      
+      <h1>Interior Design Style Quiz</h1>
       <form onSubmit={handleSubmit}>
-        <section 
-          ref={questionSectionRef} 
-          className={`question-section ${isTransitioning ? 'question-enter' : ''}`}
-        >
+        <section className="question-section">
           <div className="question-heading">
             <h2 id={`question-${currentQuestion.id}`}>
               <span className="question-number">{currentQuestion.number}</span>
@@ -498,22 +470,22 @@ const Quiz: React.FC = () => {
         </section>
 
         <div className="navigation-container">
-          {/* Always show the previous button but disable it on first question */}
-          <button 
-            type="button" 
-            className="nav-button prev-button"
-            onClick={goToPreviousQuestion}
-            disabled={currentQuestionIndex === 0 || isTransitioning}
-          >
-            Previous
-          </button>
+          {currentQuestionIndex > 0 && (
+            <button 
+              type="button" 
+              className="nav-button prev-button"
+              onClick={goToPreviousQuestion}
+            >
+              Previous
+            </button>
+          )}
           
           {!isLastQuestion ? (
             <button 
               type="button" 
               className="nav-button next-button"
               onClick={goToNextQuestion}
-              disabled={isNextDisabled() || isTransitioning}
+              disabled={isNextDisabled()}
             >
               Next
             </button>
