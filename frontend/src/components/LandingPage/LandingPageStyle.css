@@ -1,33 +1,105 @@
 .landing-page-container {
     background-color: var(--color-maroon);
-    height: 100%;
+    min-height: 100vh;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    transition: transform 0.8s ease-in-out;
+}
+
+.landing-page-container.slide-up {
+    transform: translateY(-100vh);
 }
 
 .landing-page-content {
     display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 4rem;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+@media (max-width: 768px) {
+    .landing-page-content {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}
+.landing-page-left-container {
+    display: flex;
+    width: 30%;
+    padding: 0;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.landing-page-right-container {
+    display: flex;
+    width: 70%;
+    flex-direction: column;
     gap: 2rem;
-    padding: 2rem;
-    height: 100%;
-    width: 100%;
+    align-items: center;
 }
 
 .landing-page-title {
-    font-size: 2rem;
-    font-weight: 600;
+    font-size: 6rem;
+    font-weight: bold;
     color: var(--color-white);
+    margin: 0;
+    line-height: 1;
+    margin-bottom: 0.5rem;
 }
 
 .landing-page-description {
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 400;
     color: var(--color-white);
+    margin: 0;
 }
 
 .landing-page-logo {
-    width: 100px;
-    height: 100px;
+    width: auto;
+    height: calc(100vh - 10rem);
 }
+
+.start-text {
+    color: var(--color-white);
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Remove or comment out the .start-button styles */
+/* 
+.start-button {
+    background-color: var(--color-yellow);
+    color: var(--color-black);
+    border: none;
+    border-radius: 8px;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 1rem;
+}
+
+.start-button:hover {
+    background-color: var(--color-white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+*/
