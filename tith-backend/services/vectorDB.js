@@ -1,5 +1,4 @@
 const { Pinecone } = require('@pinecone-database/pinecone');
-const OpenAI = require('openai');
 const StyleQuiz = require('../models/StyleQuiz');
 require('dotenv').config();
 
@@ -9,48 +8,37 @@ const pinecone = new Pinecone({
     environment: process.env.PINECONE_ENVIRONMENT
 });
 
-// Initialize OpenAI
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
-
 const index = pinecone.Index(process.env.PINECONE_INDEX_NAME);
 
 class VectorDBService {
-    // Convert image to text description using OpenAI Vision
+    constructor(model, visionModel, index) {
+        this.model = model;
+        this.visionModel = visionModel;
+        this.index = index;
+    }
+
+    // Convert image to text description using Gemini Vision
     async imageToText(imageBuffer) {
         try {
-            const response = await openai.chat.completions.create({
-                model: "gpt-4-vision-preview",
-                messages: [
-                    {
-                        role: "user",
-                        content: [
-                            { 
-                                type: "text", 
-                                text: "Describe this interior design image in detail. Focus on:\n" +
-                                      "1. Mood and atmosphere\n" +
-                                      "2. Color palette\n" +
-                                      "3. Textures and materials\n" +
-                                      "4. Cultural elements\n" +
-                                      "5. Accessibility features\n" +
-                                      "6. Furniture and layout\n" +
-                                      "Format the response as a JSON object with 'description' and 'tags' fields."
-                            },
-                            {
-                                type: "image_url",
-                                image_url: {
-                                    url: `data:image/jpeg;base64,${imageBuffer.toString('base64')}`
-                                }
-                            }
-                        ]
+            const result = await this.visionModel.generateContent([
+                "Describe this interior design image in detail. Focus on:\n" +
+                "1. Mood and atmosphere\n" +
+                "2. Color palette\n" +
+                "3. Textures and materials\n" +
+                "4. Cultural elements\n" +
+                "5. Accessibility features\n" +
+                "6. Furniture and layout\n" +
+                "Format the response as a JSON object with 'description' and 'tags' fields.",
+                {
+                    inlineData: {
+                        mimeType: "image/jpeg",
+                        data: imageBuffer.toString('base64')
                     }
-                ],
-                max_tokens: 500
-            });
-            
-            // Parse the JSON response
-            const content = response.choices[0].message.content;
+                }
+            ]);
+
+            const response = await result.response;
+            const content = response.text();
             return JSON.parse(content);
         } catch (error) {
             console.error('Error in image to text conversion:', error);
@@ -58,15 +46,12 @@ class VectorDBService {
         }
     }
 
-    // Convert text to vector using OpenAI embeddings
+    // Convert text to vector using Gemini embeddings
     async textToVector(text) {
         try {
-            const response = await openai.embeddings.create({
-                model: "text-embedding-3-small",
-                input: text,
-                encoding_format: "float"
-            });
-            return response.data[0].embedding;
+            const result = await this.model.embedContent(text);
+            const embedding = await result.embedding;
+            return embedding.values;
         } catch (error) {
             console.error('Error in text to vector conversion:', error);
             throw error;
@@ -76,7 +61,7 @@ class VectorDBService {
     // Store vector in Pinecone
     async storeVector(id, vector, metadata = {}) {
         try {
-            await index.upsert([{
+            await this.index.upsert([{
                 id: id,
                 values: vector,
                 metadata: metadata
@@ -90,7 +75,7 @@ class VectorDBService {
     // Query similar vectors
     async querySimilarVectors(vector, topK = 5) {
         try {
-            const queryResponse = await index.query({
+            const queryResponse = await this.index.query({
                 vector: vector,
                 topK: topK,
                 includeMetadata: true
@@ -131,22 +116,13 @@ class VectorDBService {
     // Generate style summary from quiz responses
     async generateStyleSummary(quizResponses) {
         try {
-            const response = await openai.chat.completions.create({
-                model: "gpt-4",
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are an interior design expert. Create a natural language summary of the user's style preferences based on their quiz responses."
-                    },
-                    {
-                        role: "user",
-                        content: JSON.stringify(quizResponses)
-                    }
-                ],
-                max_tokens: 300
-            });
-            
-            return response.choices[0].message.content;
+            const result = await this.model.generateContent([
+                "You are an interior design expert. Create a natural language summary of the user's style preferences based on their quiz responses.",
+                JSON.stringify(quizResponses)
+            ]);
+
+            const response = await result.response;
+            return response.text();
         } catch (error) {
             console.error('Error generating style summary:', error);
             throw error;
@@ -220,4 +196,4 @@ class VectorDBService {
     }
 }
 
-module.exports = new VectorDBService(); 
+module.exports = VectorDBService; 
