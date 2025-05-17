@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './QuizStyle.css';
 import quizQuestions from './QuizQuestions';
-import type { Question, QuestionType } from './QuizQuestions';
+import type { Question } from './QuizQuestions';
 
 interface QuizResponse {
   [key: number]: number | null | string;
@@ -116,18 +116,33 @@ const Quiz: React.FC = () => {
 
   // Render a text input question
   const renderTextQuestion = (question: Question) => {
+    // Get placeholder text based on input type
+    const getPlaceholderText = () => {
+      switch (question.inputType) {
+        case 'tel':
+          return 'e.g., (555) 123-4567';
+        case 'email':
+          return 'e.g., name@example.com';
+        default:
+          return 'e.g., John Smith';
+      }
+    };
+
     return (
       <div className="text-input-container">
-        <input
-          type={question.inputType || 'text'}
-          id={`question-${question.id}`}
-          name={`question-${question.id}`}
-          value={responses[question.id] as string}
-          onChange={(e) => handleTextInput(question.id, e.target.value)}
-          placeholder={question.placeholder}
-          className="text-input"
-          required
-        />
+        <div className="text-input-wrapper">
+          <input
+            type={question.inputType || 'text'}
+            id={`question-${question.id}`}
+            name={`question-${question.id}`}
+            value={responses[question.id] as string}
+            onChange={(e) => handleTextInput(question.id, e.target.value)}
+            className="text-input"
+            placeholder={getPlaceholderText()}
+            required
+            aria-label={question.placeholder}
+          />
+        </div>
       </div>
     );
   };

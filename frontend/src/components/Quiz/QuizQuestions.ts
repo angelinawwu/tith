@@ -55,7 +55,7 @@ const quizQuestions: Question[] = [
     title: 'Your Name',
     description: 'Please enter your full name',
     options: [],
-    placeholder: 'John Doe',
+    placeholder: 'e.g., John Smith',
     inputType: 'text'
   },
   {
@@ -65,7 +65,7 @@ const quizQuestions: Question[] = [
     title: 'Phone Number',
     description: 'Please enter your phone number',
     options: [],
-    placeholder: '(123) 456-7890',
+    placeholder: 'e.g., (555) 123-4567',
     inputType: 'tel'
   },
   {
@@ -75,7 +75,7 @@ const quizQuestions: Question[] = [
     title: 'Email Address',
     description: 'Please enter your email address',
     options: [],
-    placeholder: 'your@email.com',
+    placeholder: 'e.g., name@example.com',
     inputType: 'email'
   }
 ];
