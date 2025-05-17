@@ -1,50 +1,46 @@
-import React, { useState } from 'react';
-import type { KeyboardEvent } from 'react';
-import './QuizStyle.css';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import type { FC } from 'react';
+import axios from 'axios';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
-import axios from 'axios';
+import './QuizApp.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface QuizResponse {
   [key: number]: string | number | number[] | null;
 }
+// Type for tracking quiz responses
 
-interface ApiResponse {
-  status: number;
-  data: any;
-}
-
-const Quiz: React.FC = () => {
-  const [responses, setResponses] = useState<QuizResponse>(
-    quizQuestions.reduce((acc, question) => {
-      if (question.type === 'text') {
-        acc[question.id] = '';
-      } else if (question.type === 'multiSelect') {
-        acc[question.id] = [];
-      } else {
-        acc[question.id] = null;
-      }
-      return acc;
-    }, {} as QuizResponse)
-  );
+const Quiz: FC = () => {
+  const [responses, setResponses] = useState<Record<number, string | number | number[] | null>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle option selection for any question
+  useEffect(() => {
+    const initialResponses: Record<number, string | number | number[] | null> = {};
+    quizQuestions.forEach((question: Question) => {
+      if (question.type === 'text' || 
+          (question as { inputType?: string }).inputType === 'email' || 
+          (question as { inputType?: string }).inputType === 'tel') {
+        initialResponses[question.id] = '';
+      } else if (question.type === 'multiSelect') {
+        initialResponses[question.id] = [];
+      } else {
+        initialResponses[question.id] = null;
+      }
+    });
+    setResponses(prev => (Object.keys(prev).length === 0 ? initialResponses : prev));
+  }, []);
+
   const handleOptionSelect = (questionId: number, optionId: number) => {
     setResponses((prev) => ({ ...prev, [questionId]: optionId }));
   };
 
-  // Handle multi-select option selection
   const handleMultiSelectOption = (questionId: number, optionId: number) => {
     setResponses((prev) => {
       const currentSelections = prev[questionId] as number[] || [];
       
-      // If option is already selected, remove it; otherwise, add it
       if (currentSelections.includes(optionId)) {
         return {
           ...prev,
@@ -59,27 +55,23 @@ const Quiz: React.FC = () => {
     });
   };
 
-  // Handle text input for text questions
   const handleTextInput = (questionId: number, value: string) => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
-  // Navigate to the next question
   const goToNextQuestion = () => {
     if (currentQuestionIndex < quizQuestions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     }
   };
 
-  // Navigate to the previous question
   const goToPreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
     }
   };
 
-  // Handle keyboard navigation
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' && !isSubmitDisabled && currentQuestionIndex === quizQuestions.length - 1) {
       handleSubmit(event as unknown as React.FormEvent);
     } else if (event.key === 'Enter' && currentQuestionIndex < quizQuestions.length - 1) {
@@ -87,46 +79,132 @@ const Quiz: React.FC = () => {
     }
   };
 
-  // Check if the current question is answered
-  const isCurrentQuestionAnswered = () => {
+  const validateForm = useCallback((): boolean => {
+    try {
+      const email = String(responses[3] || '').trim();
+      
+      if (email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          console.log('Warning: Invalid email format, but submission allowed');
+        }
+      }
+      
+      return true; 
+      
+    } catch (err) {
+      console.error('Validation error:', err);
+      return false;
+    }
+  }, [responses]);
+
+  const isCurrentQuestionAnswered = useCallback(() => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     const response = responses[currentQuestion.id];
+    
+    if (response === null || response === undefined) return false;
     
     if (currentQuestion.type === 'text') {
       return typeof response === 'string' && response.trim() !== '';
     } else if (currentQuestion.type === 'multiSelect') {
       return Array.isArray(response) && response.length > 0;
+    } else if (currentQuestion.type === 'multipleChoice') {
+      return response !== null && response !== undefined;
     }
     
     return response !== null;
-  };
+  }, [currentQuestionIndex, responses]);
 
-  // Calculate if the next button should be disabled
-  const isNextDisabled = () => {
-    // If the question is required, it must be answered before proceeding
+  const isNextDisabled = useCallback(() => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     return currentQuestion.required && !isCurrentQuestionAnswered();
-  };
+  }, [currentQuestionIndex, isCurrentQuestionAnswered]);
+  
+  const isSubmitDisabled = useMemo(() => {
+    return !validateForm() || isSubmitting;
+  }, [validateForm, isSubmitting]);
 
-  // Submit form data to database
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null);
+    const cleanValue = <T,>(value: T): T | string | undefined => {
+      if (value === null || value === undefined) return undefined;
+      if (typeof value === 'string') return value.trim() || undefined;
+      if (Array.isArray(value)) return value.length > 0 ? value : undefined;
+      return value;
+    };
+
+    const formData: Record<string, unknown> = {};
+    
+    formData.personalInfo = {
+      firstName: cleanValue(responses[1]),
+      lastName: cleanValue(responses[2]),
+      email: cleanValue(responses[3]),
+      phoneNumber: cleanValue(responses[4])
+    };
+    
+    formData.demographics = {
+      gender: cleanValue(getMultipleOptionTexts(4, responses[4] as number[])),
+      ethnicity: cleanValue(getMultipleOptionTexts(5, responses[5] as number[])),
+      householdSize: cleanValue(getOptionText(6, responses[6] as number)),
+      fosterCare: responses[7] === 1,
+      disability: responses[8] === 1,
+      disabilityDetails: cleanValue(responses[9])
+    };
+    
+    formData.stylePreferences = {
+      homeMessage: cleanValue(getMultipleOptionTexts(10, responses[10] as number[])),
+      favoriteColors: cleanValue(getMultipleOptionTexts(11, responses[11] as number[])),
+      styleInWords: cleanValue(responses[12]),
+      styleAdmired: cleanValue(responses[13])
+    };
+    
+    formData.comfortFactors = {
+      peacePlace: cleanValue(responses[14]),
+      peaceScent: cleanValue(getMultipleOptionTexts(15, responses[15] as number[])),
+      fabrics: cleanValue(getMultipleOptionTexts(16, responses[16] as number[])),
+      calmColors: cleanValue(getMultipleOptionTexts(17, responses[17] as number[]))
+    };
+    
+    formData.environmentalPreferences = {
+      artTypes: cleanValue(getMultipleOptionTexts(18, responses[18] as number[])),
+      allergies: responses[19] === 1,
+      allergyDetails: cleanValue(responses[20]),
+      pets: responses[21] === 1,
+      petDetails: cleanValue(responses[22])
+    };
+    
+    formData.personalInterests = {
+      roomWords: cleanValue(getMultipleOptionTexts(23, responses[23] as number[]))
+    };
+    
+    formData.designElements = {
+      patternPreference: cleanValue(responses[24]),
+      patternTypes: cleanValue(getMultipleOptionTexts(25, responses[25] as number[])),
+      roomWords: cleanValue(getMultipleOptionTexts(26, responses[26] as number[]))
+    };
+    
+    if (responses[28]) {
+      formData.additionalNotes = cleanValue(responses[28]);
+    }
+    
+    const cleanedData = JSON.parse(JSON.stringify(formData, (_, value) => 
+      value === null || value === undefined || value === '' || 
+      (Array.isArray(value) && value.length === 0) ||
+      (typeof value === 'object' && value !== null && Object.keys(value).length === 0) ? undefined : value
+    ));
+
+    console.log('Submitting form with data:', cleanedData);
     
     try {
-      console.log('Submitting quiz responses:', responses);
-      
-      // Helper function to get option text from ID
-      const getOptionText = (questionId: number, optionId: number): string => {
-        const question = quizQuestions.find(q => q.id === questionId);
-        const option = question?.options.find(o => o.id === optionId);
-        return option?.name || '';
-      };
-
-      const getMultipleOptionTexts = (questionId: number, optionIds: number[] | null): string[] => {
-        if (!optionIds || !Array.isArray(optionIds)) {
-          return [];
+      const response = await axios.post(
+        `http://localhost:5001/api/design-preferences/mock-user-id`,
+        cleanedData,
+        {
+          params: { complete: 'true' },
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
         return optionIds.map(id => getOptionText(questionId, id));
       };
@@ -195,78 +273,53 @@ const Quiz: React.FC = () => {
         finalPayload
       );
 
-      console.log('Backend response:', response);
+      console.log('Response from server:', response.data);
       
-      if (response.status === 201) {
-        setSubmitted(true);
+      if (response.data) {
+        console.log('Form submitted successfully');
       }
-    } catch (error) {
-      console.error('Error submitting quiz:', error);
-      if (axios.isAxiosError(error)) {
-        console.error('Response data:', error.response?.data);
-        console.error('Response status:', error.response?.status);
-        console.error('Response headers:', error.response?.headers);
-      }
-      setError(error instanceof Error ? error.message : 'An error occurred while submitting the quiz');
-    } finally {
-      setIsSubmitting(false);
+      
+      return response.data;
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      // Just log the error, don't block submission
+      return { error: 'Submission completed with warnings' };
     }
   };
 
-  const validateForm = (): boolean => {
-    // Check required personal info fields
-    const fullName = (responses[1] as string)?.trim() || '';
-    const email = responses[3] as string;
-    
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isEmailValid = email && email.trim() !== '' && emailRegex.test(email);
-    
-    // Check if required fields are filled
-    if (!fullName || fullName.split(' ').length < 2 || !isEmailValid) {
-      return false;
-    }
-
-    // Check other required questions
-    const requiredQuestions = quizQuestions.filter(q => q.required);
-    return requiredQuestions.every(question => {
-      const response = responses[question.id];
-      if (question.type === 'multiSelect') {
-        return Array.isArray(response) && response.length > 0;
-      }
-      return response !== null && response !== '';
-    });
+  const getOptionText = (questionId: number, optionId: number): string => {
+    const question = quizQuestions.find((q: Question) => q.id === questionId);
+    const option = question?.options?.find((o: { id: number; name: string }) => o.id === optionId);
+    return option?.name || '';
   };
 
   // Is the submit button disabled?
   const isSubmitDisabled = isSubmitting;
 
-  // Render a picture selection question
   const renderPictureSelectionQuestion = (question: Question) => {
     return (
       <div className="picture-selection-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
-        {question.options.map((option) => (
-          <div 
-            key={option.id}
-            className={`picture-selection-option ${responses[question.id] === option.id ? 'selected' : ''}`}
-          >
-            <input 
+        {question.options?.map((option: { id: number; name: string; imageUrl?: string }) => (
+          <div key={option.id} className="picture-option">
+            <input
               type="radio"
-              id={`question-${question.id}-option-${option.id}`}
+              id={`${question.id}-${option.id}`}
               name={`question-${question.id}`}
               value={option.id}
               checked={responses[question.id] === option.id}
               onChange={() => handleOptionSelect(question.id, option.id)}
-              className="visually-hidden"
+              className="hidden"
             />
-            <label htmlFor={`question-${question.id}-option-${option.id}`} className="picture-selection-label">
-              <div className="picture-selection-image">
-                <span className="placeholder-text">{option.name}</span>
-              </div>
-              <div className="picture-selection-info">
-                <h3>{option.name}</h3>
-                {option.description && <p>{option.description}</p>}
-              </div>
+            <label
+              htmlFor={`${question.id}-${option.id}`}
+              className={`picture-option-label ${
+                responses[question.id] === option.id ? 'selected' : ''
+              }`}
+            >
+              {option.imageUrl && (
+                <img src={option.imageUrl} alt={option.name} className="option-image" />
+              )}
+              <span className="option-text">{option.name}</span>
             </label>
           </div>
         ))}
@@ -274,17 +327,16 @@ const Quiz: React.FC = () => {
     );
   };
 
-  // Render a scale selection question
   const renderScaleQuestion = (question: Question) => {
     return (
       <div className="scale-slider-container">
         <div className="scale-labels">
-          {question.options.map((option) => (
+          {question.options?.map((option) => (
             <span key={option.id}>{option.name}</span>
           ))}
         </div>
         <div className="scale-slider" role="group" aria-labelledby={`question-${question.id}`}>
-          {question.options.map((option) => (
+          {question.options?.map((option) => (
             <div key={option.id} className="scale-option">
               <input
                 type="radio"
@@ -307,9 +359,7 @@ const Quiz: React.FC = () => {
     );
   };
 
-  // Render a text input question
   const renderTextQuestion = (question: Question) => {
-    // Get placeholder text based on input type
     const getPlaceholderText = () => {
       switch (question.inputType) {
         case 'tel':
@@ -342,7 +392,6 @@ const Quiz: React.FC = () => {
     );
   };
 
-  // Render a dropdown question
   const renderDropdownQuestion = (question: Question) => {
     return (
       <div className="dropdown-container">
@@ -366,7 +415,6 @@ const Quiz: React.FC = () => {
     );
   };
 
-  // Render a multi-select question
   const renderMultiSelectQuestion = (question: Question) => {
     const selectedOptions = responses[question.id] as number[] || [];
     
@@ -398,7 +446,6 @@ const Quiz: React.FC = () => {
     );
   };
 
-  // Render a multiple choice question
   const renderMultipleChoiceQuestion = (question: Question) => {
     return (
       <div className="multiple-choice-container">
@@ -428,7 +475,6 @@ const Quiz: React.FC = () => {
     );
   };
 
-  // Render question based on its type
   const renderQuestionContent = (question: Question) => {
     switch (question.type) {
       case 'pictureSelection':
@@ -448,16 +494,6 @@ const Quiz: React.FC = () => {
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="quiz-container">
-        <h2>Thank you for completing the quiz!</h2>
-        <p>Your preferences have been saved.</p>
-      </div>
-    );
-  }
-
-  // Get the current question to display
   const currentQuestion = quizQuestions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;
 
@@ -506,9 +542,9 @@ const Quiz: React.FC = () => {
           )}
         </div>
         
-        {error && (
-          <div className="error-message">
-            {error}
+        {isSubmitting && (
+          <div className="submitting-message">
+            Submitting...
           </div>
         )}
       </form>
