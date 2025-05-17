@@ -154,8 +154,10 @@ const Quiz: React.FC = () => {
           return 'e.g., (555) 123-4567';
         case 'email':
           return 'e.g., name@example.com';
-        default:
+        case 'name':
           return 'e.g., John Smith';
+        default:
+          return '';
       }
     };
 

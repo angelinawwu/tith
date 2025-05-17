@@ -30,7 +30,7 @@ const quizQuestions: Question[] = [
     description: 'Full Name',
     options: [],
     placeholder: 'e.g., John Smith',
-    inputType: 'text'
+    inputType: 'name'
   },
   {
     id: 2,
@@ -165,8 +165,52 @@ const quizQuestions: Question[] = [
   },
   {
     id: 12,
-    type: 'scale',
+    type: 'text',
     number: 12,
+    title: 'Style Description',
+    description: 'Describe your style in three words.',
+    options: [],
+    inputType: 'text'
+  },
+  {
+    id: 13,
+    type: 'text',
+    number: 13,
+    title: 'Style Inspiration',
+    description: 'Whose style do you admire? ( friend, celebrity, etc.) What is it about their style that you admire?',
+    options: [],
+    inputType: 'text'
+  },
+  {
+    id: 14,
+    type: 'text',
+    number: 14,
+    title: 'Favorite Place',
+    description: 'Where do you feel the most at peace?',
+    options: [],
+    inputType: 'text'
+  },
+  {
+    id: 15,
+    type: 'multiSelect',
+    number: 15,
+    title: 'Favorite Scent',
+    description: 'Is there a smell or scent that brings you peace?',
+    options: [
+      { id: 1, name: 'No Scent' },
+      { id: 2, name: 'Lavender' },
+      { id: 3, name: 'Citrus' },
+      { id: 4, name: 'Floral' },
+      { id: 5, name: 'Spicy' },
+      { id: 6, name: 'Woodsy' },
+      { id: 7, name: 'Fresh linen' },
+      { id: 8, name: 'Vanilla' },
+    ],
+  },
+  {
+    id: 16,
+    type: 'scale',
+    number: 16,
     title: 'Fabric Texture',
     description: 'What texture do you prefer in cloth?',
     options: [
@@ -176,7 +220,94 @@ const quizQuestions: Question[] = [
       { id: 4, name: 'Slightly Soft' },
       { id: 5, name: 'Soft' },
     ]
-  }
+  },
+  {
+    // NOTE: Add pictures for each option
+    id: 17,
+    type: 'pictureSelection',
+    number: 17,
+    title: 'Calming Colors',
+    description: 'What colors bring a sense of calm or comfort for you?',
+    options: [
+        { id: 1, name: 'Earth tones' },
+        { id: 2, name: 'Warm neutrals' },
+        { id: 3, name: 'Muted blues' },
+        { id: 4, name: 'Yellows' },
+        { id: 5, name: 'Pastels' },
+        { id: 6, name: 'Vibrant colors' },
+    ],
+  },
+  {
+    id: 18,
+    type: 'pictureSelection',
+    number: 18,
+    title: 'Artwork',
+    description: 'What type of artwork speaks to you?',
+    options: [
+        { id: 1, name: 'Abstract art' },
+        { id: 2, name: 'Nature scenes' },
+        { id: 3, name: 'Photos' },
+        { id: 4, name: 'Culturally relevant art styles' },
+        { id: 5, name: 'Unsure' },
+    ],
+  },
+  {
+    id: 19,
+    type: 'dropdown',
+    number: 19,
+    title: 'Allergies',
+    description: 'Are you allergic to any scents, plants, or fabrics?',
+    options: [
+        { id: 1, name: 'Yes' },
+        { id: 2, name: 'No' },
+    ],
+  },
+  {
+    id: 20,
+    type: 'text',
+    number: 20,
+    title: 'Allergy Information',
+    description: 'If allergic to any of these items listed above, please explain.',
+    options: [],
+    inputType: 'text'
+  },
+  {
+    id: 21,
+    type: 'dropdown',
+    number: 21,
+    title: 'Pets',
+    description: 'Do you have any pets?',
+    options: [
+        { id: 1, name: 'Yes' },
+        { id: 2, name: 'No' },
+    ],
+  },
+  {
+    id: 22,
+    type: 'text',
+    number: 22,
+    title: 'Pets Information',
+    description: 'If you have any pets, please explain what type and how many',
+    options: [],
+    inputType: 'text'
+  },
+  {
+    id: 23,
+    type: 'multiSelect',
+    number: 23,
+    title: 'One Word Description',
+    description: 'When thinking about your new space, what is the one word that comes to mind?',
+    options: [
+        { id: 1, name: 'Calm' },
+        { id: 2, name: 'Joyful' },
+        { id: 3, name: 'Safe' },
+        { id: 4, name: 'Private' },
+        { id: 5, name: 'Cozy' },
+        { id: 6, name: 'Prefer not to say' },
+    ],
+  },
+  
+
 ];
 
 export default quizQuestions; 
