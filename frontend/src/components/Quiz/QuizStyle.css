@@ -1,8 +1,7 @@
 /* Quiz component styles */
-<<<<<<< HEAD
 :root {
-  --color-yellow: #FFC107;
-  --color-lavender: #E6E6FA;
+  --color-yellow: #BF9526;
+  --color-lavender: #E1C2CE;
   --color-black: #1A1A1A;
   --color-white: #FFFFFF;
   --color-light-gray: #F5F5F5;
@@ -131,21 +130,13 @@
 }
 
 /* Quiz container styles */
-=======
-
->>>>>>> origin/main
 .quiz-container {
   width: 100%;
   min-height: calc(100vh - 100px); /* Full height minus header */
   max-width: 1000px;
-<<<<<<< HEAD
   min-width: 320px;
   margin: 0 auto 40px; /* Remove top margin since we're using body padding */
   padding: 0 15px;
-=======
-  margin: 0 auto;
-  padding: 1rem 15px;
->>>>>>> origin/main
   box-sizing: border-box;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--color-white);
@@ -182,33 +173,18 @@
   background-color: var(--color-white);
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  transition: opacity 300ms ease, transform 300ms ease;
 }
 
-/* Question transition animations */
-.question-enter {
+.question-section.question-exit {
   opacity: 0;
   transform: translateY(20px);
 }
 
-.question-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms ease, transform 300ms ease;
-}
-
-.question-exit {
-  opacity: 1;
-  position: absolute;
-  width: 100%;
-  left: 0;
-  top: 0;
-  transform: translateY(0);
-}
-
-.question-exit-active {
+.question-section.question-enter {
   opacity: 0;
   transform: translateY(-20px);
-  transition: opacity 300ms ease, transform 300ms ease;
 }
 
 .question-heading {

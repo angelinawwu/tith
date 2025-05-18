@@ -9,6 +9,15 @@
     background-color: var(--color-maroon);
     color: var(--color-white);
     box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    z-index: 100;
+    background: var(--color-maroon);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    animation: none !important;
 }
 
 .header-title {

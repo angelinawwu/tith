@@ -1,20 +1,12 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-=======
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import type { FC } from 'react';
->>>>>>> origin/main
 import axios from 'axios';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
-import DesignGenerator from '../DesignGenerator/DesignGenerator';
 import './QuizStyle.css';
 import TextToSpeech from './TextToSpeech';
 
 
-<<<<<<< HEAD
-const Quiz = () => {
-=======
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface QuizProps {
@@ -22,23 +14,15 @@ interface QuizProps {
 }
 
 const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
->>>>>>> origin/main
   const [responses, setResponses] = useState<Record<number, string | number | number[] | null>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
   const questionSectionRef = useRef<HTMLElement>(null);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-<<<<<<< HEAD
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submittedData, setSubmittedData] = useState<Record<string, any> | null>(null);
-  const [showResponses, setShowResponses] = useState(false);
-  const [showDesignGenerator, setShowDesignGenerator] = useState(false);
-=======
   const [autoTTS, setAutoTTS] = useState(false);
->>>>>>> origin/main
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
 
   useEffect(() => {
     const initialResponses: Record<number, string | number | number[] | null> = {};
@@ -92,36 +76,16 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   };
 
   const animateQuestionTransition = (newIndex: number, direction: 'next' | 'prev') => {
+    if (isTransitioning) return;
+    
     setTransitionDirection(direction);
     setIsTransitioning(true);
     
-    // Add exit animation classes
-    if (questionSectionRef.current) {
-      questionSectionRef.current.classList.add('question-exit', 'question-exit-active');
-    }
-  
     setTimeout(() => {
       setCurrentQuestionIndex(newIndex);
-      
-      // Remove exit classes and add enter classes
-      if (questionSectionRef.current) {
-        questionSectionRef.current.classList.remove('question-exit', 'question-exit-active');
-        questionSectionRef.current.classList.add('question-enter');
-        
-        // Force reflow to ensure the enter animation plays
-        void questionSectionRef.current.offsetHeight;
-        
-        // Start enter animation
-        questionSectionRef.current.classList.add('question-enter-active');
-        
-        // Clean up after animation completes
-        setTimeout(() => {
-          if (questionSectionRef.current) {
-            questionSectionRef.current.classList.remove('question-enter', 'question-enter-active');
-            setIsTransitioning(false);
-          }
-        }, 300);
-      }
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 300);
     }, 300);
   };
 
@@ -168,91 +132,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return; // Prevent multiple submissions
-    
     setIsSubmitting(true);
-<<<<<<< HEAD
-    
-    try {
-      const cleanValue = <T,>(value: T): T | string | undefined => {
-        if (value === null || value === undefined) return undefined;
-        if (typeof value === 'string') return value.trim() || undefined;
-        if (Array.isArray(value)) return value.length > 0 ? value : undefined;
-        return value;
-      };
-
-    const formData: Record<string, unknown> = {};
-    
-    formData.personalInfo = {
-      firstName: cleanValue(responses[1]),
-      lastName: cleanValue(responses[2]),
-      email: cleanValue(responses[3]),
-      phoneNumber: cleanValue(responses[4])
-    };
-    
-    formData.demographics = {
-      gender: cleanValue(getMultipleOptionTexts(4, responses[4] as number[])),
-      ethnicity: cleanValue(getMultipleOptionTexts(5, responses[5] as number[])),
-      householdSize: cleanValue(getOptionText(6, responses[6] as number)),
-      fosterCare: responses[7] === 1,
-      disability: responses[8] === 1,
-      disabilityDetails: cleanValue(responses[9])
-    };
-    
-    formData.stylePreferences = {
-      homeMessage: cleanValue(getMultipleOptionTexts(10, responses[10] as number[])),
-      favoriteColors: cleanValue(getMultipleOptionTexts(11, responses[11] as number[])),
-      styleInWords: cleanValue(responses[12]),
-      styleAdmired: cleanValue(responses[13])
-    };
-    
-    formData.comfortFactors = {
-      peacePlace: cleanValue(responses[14]),
-      peaceScent: cleanValue(getMultipleOptionTexts(15, responses[15] as number[])),
-      fabrics: cleanValue(getMultipleOptionTexts(16, responses[16] as number[])),
-      calmColors: cleanValue(getMultipleOptionTexts(17, responses[17] as number[]))
-    };
-    
-    formData.environmentalPreferences = {
-      artTypes: cleanValue(getMultipleOptionTexts(18, responses[18] as number[])),
-      allergies: responses[19] === 1,
-      allergyDetails: cleanValue(responses[20]),
-      pets: responses[21] === 1,
-      petDetails: cleanValue(responses[22])
-    };
-    
-    formData.personalInterests = {
-      roomWords: cleanValue(getMultipleOptionTexts(23, responses[23] as number[]))
-    };
-    
-    formData.designElements = {
-      patternPreference: cleanValue(responses[24]),
-      patternTypes: cleanValue(getMultipleOptionTexts(25, responses[25] as number[])),
-      roomWords: cleanValue(getMultipleOptionTexts(26, responses[26] as number[]))
-    };
-    
-    if (responses[28]) {
-      formData.additionalNotes = cleanValue(responses[28]);
-    }
-    
-      const cleanedData = JSON.parse(JSON.stringify(formData, (_, value) => 
-        value === null || value === undefined || value === '' || 
-        (Array.isArray(value) && value.length === 0) ||
-        (typeof value === 'object' && value !== null && Object.keys(value).length === 0) ? undefined : value
-      ));
-
-      console.log('Submitting form with data:', cleanedData);
-      
-      const response = await axios.post(
-        `http://localhost:5001/api/design-preferences/mock-user-id`,
-        cleanedData,
-        {
-          params: { complete: 'true' },
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          timeout: 10000 // 10 second timeout
-=======
     try {
       console.log('Submitting quiz responses:', responses);
       // Only use fullName for name input
@@ -261,7 +141,6 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
           fullName: String(responses[1] || '').trim() || '',
           phoneNumber: String(responses[2] || '').trim() || '',
           email: String(responses[3] || '').trim() || ''
->>>>>>> origin/main
         }
         // Add other fields as needed, using getMultipleOptionTexts(questionId, responses)
       };
@@ -277,25 +156,6 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
         `${API_URL}/api/style-quiz/submit`,
         finalPayload
       );
-<<<<<<< HEAD
-
-      console.log('Response from server:', response.data);
-      
-      if (response.data) {
-        console.log('Form submitted successfully');
-        setSubmittedData(cleanedData);
-        setIsSubmitted(true);
-      }
-      
-      return response.data;
-    } catch (err) {
-      console.error('Error submitting form:', err);
-      // Show error to user
-      alert('There was an error submitting your form. Please try again.');
-      return { error: 'Submission failed' };
-    } finally {
-      setIsSubmitting(false); // Always reset submitting state
-=======
       console.log('Backend response:', response);
       if (response.status === 200 || response.status === 201) {
         // Handle successful submission
@@ -309,7 +169,6 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
       }
     } finally {
       setIsSubmitting(false);
->>>>>>> origin/main
     }
   };
 
@@ -566,49 +425,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
       default:
         return null;
     }
-  }
-
-  // If form is submitted, show success message
-  if (isSubmitted && submittedData) {
-    if (showDesignGenerator) {
-      return (
-        <DesignGenerator 
-          quizResponses={submittedData} 
-          onBack={() => setShowDesignGenerator(false)}
-        />
-      );
-    }
-
-    return (
-      <div className="quiz-complete">
-        <h2>Thank you for completing the quiz!</h2>
-        <p>Your responses have been recorded.</p>
-        
-        <div className="action-buttons">
-          <button 
-            onClick={() => setShowResponses(!showResponses)} 
-            className="btn"
-          >
-            {showResponses ? 'Hide My Responses' : 'View My Responses'}
-          </button>
-          
-          <button
-            onClick={() => setShowDesignGenerator(true)}
-            className="btn btn-primary"
-          >
-            Generate My Interior Design
-          </button>
-        </div>
-        
-        {showResponses && (
-          <div className="responses-summary">
-            <h3>Your Responses:</h3>
-            <pre>{JSON.stringify(submittedData, null, 2)}</pre>
-          </div>
-        )}
-      </div>
-    );
-  }
+  };
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;
@@ -633,11 +450,6 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
 
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
-<<<<<<< HEAD
-      <h1>Interior Design Style Quiz</h1>
-      <form onSubmit={handleSubmit} className="quiz-form">
-        <section className="question-section">
-=======
       <form onSubmit={handleSubmit}>
         {renderAutoTTSToggle()}
         <section 
@@ -646,7 +458,6 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
             (transitionDirection === 'next' ? 'question-exit' : 'question-enter') : 
             ''}`}
         >
->>>>>>> origin/main
           <div className="question-heading">
             <h2 id={`question-${currentQuestion.id}`}>
               <span className="question-number">{currentQuestion.number}</span>
@@ -663,38 +474,38 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
             </div>
           </div>
           {renderQuestionContent(currentQuestion)}
+          
+          <div className="navigation-container">
+              <button 
+                type="button" 
+                className="nav-button prev-button"
+                onClick={goToPreviousQuestion}
+              disabled={currentQuestionIndex === 0}
+              >
+                Previous
+              </button>
+            
+            {!isLastQuestion ? (
+              <button 
+                type="button" 
+                className="nav-button next-button"
+                onClick={goToNextQuestion}
+                disabled={isNextDisabled()}
+              >
+                Next
+              </button>
+            ) : (
+              <button 
+                type="submit" 
+                className={`submit-button ${isSubmitDisabled ? 'disabled' : ''}`}
+                disabled={isSubmitDisabled}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Responses'}
+              </button>
+            )}
+          </div>
         </section>
 
-        <div className="navigation-container">
-            <button 
-              type="button" 
-              className="nav-button prev-button"
-              onClick={goToPreviousQuestion}
-            disabled={currentQuestionIndex === 0 || isTransitioning}
-            >
-              Previous
-            </button>
-          
-          {!isLastQuestion ? (
-            <button 
-              type="button" 
-              className="nav-button next-button"
-              onClick={goToNextQuestion}
-              disabled={isNextDisabled() || isTransitioning}
-            >
-              Next
-            </button>
-          ) : (
-            <button 
-              type="submit" 
-              className={`submit-button ${isSubmitDisabled ? 'disabled' : ''}`}
-              disabled={isSubmitDisabled}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit Responses'}
-            </button>
-          )}
-        </div>
-        
         {isSubmitting && (
           <div className="submitting-message">
             Submitting...
