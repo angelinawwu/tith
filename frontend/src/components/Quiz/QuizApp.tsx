@@ -247,7 +247,7 @@ const Quiz: FC = () => {
             type={question.inputType || 'text'}
             id={`question-${question.id}`}
             name={`question-${question.id}`}
-            value={responses[question.id] as string}
+            value={responses[question.id] ?? ''}
             onChange={(e) => handleTextInput(question.id, e.target.value)}
             className="text-input"
             placeholder={getPlaceholderText()}
@@ -265,7 +265,7 @@ const Quiz: FC = () => {
         <select
           id={`question-${question.id}`}
           name={`question-${question.id}`}
-          value={responses[question.id] as number || ""}
+          value={responses[question.id] ?? ''}
           onChange={(e) => handleOptionSelect(question.id, Number(e.target.value))}
           className="dropdown-select"
           required
@@ -295,7 +295,7 @@ const Quiz: FC = () => {
                 id={`question-${question.id}-option-${option.id}`}
                 name={`question-${question.id}`}
                 value={option.id}
-                checked={selectedOptions.includes(option.id)}
+                checked={Array.isArray(responses[question.id]) ? (responses[question.id] as number[]).includes(option.id) : false}
                 onChange={() => handleMultiSelectOption(question.id, option.id)}
                 className="multi-select-checkbox"
               />
