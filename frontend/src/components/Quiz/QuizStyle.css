@@ -1020,4 +1020,33 @@
   background-color: rgba(255, 193, 7, 0.1);
   border-radius: 4px;
   text-align: center;
+}
+
+.other-input-container {
+  margin-top: 0.5rem;
+  padding-left: 2.5rem;
+  width: 100%;
+}
+
+.other-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-white-shadow);
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.other-input:focus {
+  outline: none;
+  border-color: var(--color-yellow);
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+}
+
+.other-input-tts {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
 } 

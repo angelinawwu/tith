@@ -382,7 +382,6 @@ const quizQuestions: Question[] = [
       { id: 1, name: 'Prayer space' },
       { id: 2, name: 'Altar' },
       { id: 3, name: 'Incense area' },
-      { id: 4, name: 'Other' },
     ],
   },
   {
@@ -396,7 +395,6 @@ const quizQuestions: Question[] = [
       { id: 2, name: 'Metal surfaces' },
       { id: 3, name: 'Clutter' },
       { id: 4, name: 'Loud patterns' },
-      { id: 5, name: 'Other' },
     ],
   },
   {

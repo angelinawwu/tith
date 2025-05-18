@@ -16,6 +16,7 @@ interface QuizProps {
 
 const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const [responses, setResponses] = useState<Record<number, string | number | number[] | null>>({});
+  const [otherInputs, setOtherInputs] = useState<Record<number, string>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const questionSectionRef = useRef<HTMLElement>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -25,6 +26,10 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
   const [showResults, setShowResults] = useState(false);
+
+  // Questions that should have "Other" option
+  const QUESTIONS_WITH_OTHER = [4, 5, 25, 28, 29];
+  const OTHER_OPTION_ID = 9999;
 
   useEffect(() => {
     const initialResponses: Record<number, string | number | number[] | null> = {};
@@ -120,17 +125,30 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const isCurrentQuestionAnswered = useCallback(() => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     const response = responses[currentQuestion.id];
+    
     if (response === null || response === undefined) return false;
+    
     if (currentQuestion.type === 'text') {
       return typeof response === 'string' && response.trim() !== '';
     } else if (currentQuestion.type === 'multiSelect' || 
                (currentQuestion.type === 'pictureSelection' && (currentQuestion.id === 15 || currentQuestion.id === 21))) {
-      return Array.isArray(response) && response.length > 0;
+      // For multi-select questions, check if any option is selected
+      if (!Array.isArray(response) || response.length === 0) return false;
+      
+      // For questions with "Other" option, require text input if "Other" is selected
+      if (QUESTIONS_WITH_OTHER.includes(currentQuestion.id) && 
+          response.includes(OTHER_OPTION_ID) && 
+          (!otherInputs[currentQuestion.id] || otherInputs[currentQuestion.id].trim() === '')) {
+        return false;
+      }
+      
+      return true;
     } else if (currentQuestion.type === 'multipleChoice') {
       return response !== null && response !== undefined;
     }
+    
     return response !== null;
-  }, [currentQuestionIndex, responses]);
+  }, [currentQuestionIndex, responses, otherInputs, QUESTIONS_WITH_OTHER, OTHER_OPTION_ID]);
 
   const isNextDisabled = useCallback(() => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
@@ -143,7 +161,24 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      console.log('Submitting quiz responses:', responses);
+      // Prepare final responses with "Other" text inputs
+      const finalResponses: Record<number, any> = { ...responses };
+      
+      // Add "Other" text to specific questions
+      Object.keys(otherInputs).forEach(questionId => {
+        const qId = parseInt(questionId);
+        const response = finalResponses[qId];
+        
+        // Only for multi-select questions with "Other" option selected
+        if (Array.isArray(response) && response.includes(OTHER_OPTION_ID)) {
+          finalResponses[qId] = {
+            selectedOptions: response,
+            otherText: otherInputs[qId] || ''
+          };
+        }
+      });
+      
+      console.log('Submitting quiz responses:', finalResponses);
       const requestData = {
         personalInfo: {
           fullName: String(responses[1] || '').trim() || '',
@@ -155,7 +190,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
       const randomUserId = 'user_' + Math.random().toString(36).substr(2, 9);
       const finalPayload = {
         userId: randomUserId,
-        responses: responses
+        responses: finalResponses
       };
       console.log('Final payload:', finalPayload);
       const response = await axios.post(
@@ -365,6 +400,8 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
 
   const renderMultiSelectQuestion = (question: Question) => {
     const selectedOptions = responses[question.id] as number[] || [];
+    const hasOtherOption = QUESTIONS_WITH_OTHER.includes(question.id);
+    const hasOtherSelected = hasOtherOption && selectedOptions.includes(OTHER_OPTION_ID);
     
     return (
       <div className="multi-select-container">
@@ -402,6 +439,56 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
               </label>
             </div>
           ))}
+          
+          {/* Add "Other" option for specific questions */}
+          {hasOtherOption && (
+            <div className="multi-select-option">
+              <input
+                type="checkbox"
+                id={`question-${question.id}-option-other`}
+                name={`question-${question.id}`}
+                value={OTHER_OPTION_ID}
+                checked={hasOtherSelected}
+                onChange={() => handleMultiSelectOption(question.id, OTHER_OPTION_ID)}
+                className="multi-select-checkbox"
+              />
+              <label 
+                htmlFor={`question-${question.id}-option-other`}
+                className="multi-select-label"
+              >
+                <span className="checkmark"></span>
+                <span className="multi-select-label-text">Other</span>
+                <TextToSpeech 
+                  text="Other" 
+                  size="small" 
+                  className="ml-2"
+                  showLabel={false}
+                />
+              </label>
+            </div>
+          )}
+          
+          {/* Show text input if "Other" is selected */}
+          {hasOtherSelected && (
+            <div className="other-input-container">
+              <input
+                type="text"
+                placeholder="Please specify..."
+                value={otherInputs[question.id] || ''}
+                onChange={(e) => setOtherInputs(prev => ({ ...prev, [question.id]: e.target.value }))}
+                className="other-input"
+              />
+              {otherInputs[question.id] && (
+                <div className="other-input-tts">
+                  <TextToSpeech 
+                    text={otherInputs[question.id]} 
+                    size="small" 
+                    showLabel={false}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );
