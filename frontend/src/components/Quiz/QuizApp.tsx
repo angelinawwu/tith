@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { FC } from 'react';
 import axios from 'axios';
 import quizQuestions from './QuizQuestions';
@@ -7,17 +7,10 @@ import './QuizStyle.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-interface QuizResponse {
-  [key: number]: string | number | number[] | null;
-}
-// Type for tracking quiz responses
-
 const Quiz: FC = () => {
   const [responses, setResponses] = useState<Record<number, string | number | number[] | null>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const initialResponses: Record<number, string | number | number[] | null> = {};
@@ -35,30 +28,13 @@ const Quiz: FC = () => {
     setResponses(prev => (Object.keys(prev).length === 0 ? initialResponses : prev));
   }, []);
 
-  useEffect(() => {
-    const initialResponses: Record<number, string | number | number[] | null> = {};
-    quizQuestions.forEach((question: Question) => {
-      if (question.type === 'text' || 
-          (question as { inputType?: string }).inputType === 'email' || 
-          (question as { inputType?: string }).inputType === 'tel') {
-        initialResponses[question.id] = '';
-      } else if (question.type === 'multiSelect') {
-        initialResponses[question.id] = [];
-      } else {
-        initialResponses[question.id] = null;
-      }
-    });
-    setResponses(prev => (Object.keys(prev).length === 0 ? initialResponses : prev));
-  }, []);
-
   const handleOptionSelect = (questionId: number, optionId: number) => {
     setResponses((prev) => ({ ...prev, [questionId]: optionId }));
   };
 
   const handleMultiSelectOption = (questionId: number, optionId: number) => {
     setResponses((prev) => {
-      const currentSelections = prev[questionId] as number[] || [];
-      
+      const currentSelections = Array.isArray(prev[questionId]) ? (prev[questionId] as number[]) : [];
       if (currentSelections.includes(optionId)) {
         return {
           ...prev,
@@ -97,31 +73,10 @@ const Quiz: FC = () => {
     }
   };
 
-  const validateForm = useCallback((): boolean => {
-    try {
-      const email = String(responses[3] || '').trim();
-      
-      if (email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          console.log('Warning: Invalid email format, but submission allowed');
-        }
-      }
-      return true;
-      
-      
-    } catch (err) {
-      console.error('Validation error:', err);
-      return false;
-    }
-  }, [responses]);
-
   const isCurrentQuestionAnswered = useCallback(() => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     const response = responses[currentQuestion.id];
-    
     if (response === null || response === undefined) return false;
-    
     if (currentQuestion.type === 'text') {
       return typeof response === 'string' && response.trim() !== '';
     } else if (currentQuestion.type === 'multiSelect') {
@@ -136,151 +91,24 @@ const Quiz: FC = () => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     return currentQuestion.required && !isCurrentQuestionAnswered();
   }, [currentQuestionIndex, isCurrentQuestionAnswered]);
-  
-  const isSubmitDisabled = useMemo(() => {
-    return !validateForm() || isSubmitting;
-  }, [validateForm, isSubmitting]);
+
+  const isSubmitDisabled = isSubmitting;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null);
     try {
       console.log('Submitting quiz responses:', responses);
-    const cleanValue = <T,>(value: T): T | string | undefined => {
-      if (value === null || value === undefined) return undefined;
-      if (typeof value === 'string') return value.trim() || undefined;
-      if (Array.isArray(value)) return value.length > 0 ? value : undefined;
-      return value;
-    };
-
-    const formData: Record<string, unknown> = {};
-    
-    formData.personalInfo = {
-      firstName: cleanValue(responses[1]),
-      lastName: cleanValue(responses[2]),
-      email: cleanValue(responses[3]),
-      phoneNumber: cleanValue(responses[4])
-    };
-    
-    formData.demographics = {
-      gender: cleanValue(getMultipleOptionTexts(4, responses[4] as number[])),
-      ethnicity: cleanValue(getMultipleOptionTexts(5, responses[5] as number[])),
-      householdSize: cleanValue(getOptionText(6, responses[6] as number)),
-      fosterCare: responses[7] === 1,
-      disability: responses[8] === 1,
-      disabilityDetails: cleanValue(responses[9])
-    };
-    
-    formData.stylePreferences = {
-      homeMessage: cleanValue(getMultipleOptionTexts(10, responses[10] as number[])),
-      favoriteColors: cleanValue(getMultipleOptionTexts(11, responses[11] as number[])),
-      styleInWords: cleanValue(responses[12]),
-      styleAdmired: cleanValue(responses[13])
-    };
-    
-    formData.comfortFactors = {
-      peacePlace: cleanValue(responses[14]),
-      peaceScent: cleanValue(getMultipleOptionTexts(15, responses[15] as number[])),
-      fabrics: cleanValue(getMultipleOptionTexts(16, responses[16] as number[])),
-      calmColors: cleanValue(getMultipleOptionTexts(17, responses[17] as number[]))
-    };
-    
-    formData.environmentalPreferences = {
-      artTypes: cleanValue(getMultipleOptionTexts(18, responses[18] as number[])),
-      allergies: responses[19] === 1,
-      allergyDetails: cleanValue(responses[20]),
-      pets: responses[21] === 1,
-      petDetails: cleanValue(responses[22])
-    };
-    
-    formData.personalInterests = {
-      roomWords: cleanValue(getMultipleOptionTexts(23, responses[23] as number[]))
-    };
-    
-    formData.designElements = {
-      patternPreference: cleanValue(responses[24]),
-      patternTypes: cleanValue(getMultipleOptionTexts(25, responses[25] as number[])),
-      roomWords: cleanValue(getMultipleOptionTexts(26, responses[26] as number[]))
-    };
-    
-    if (responses[28]) {
-      formData.additionalNotes = cleanValue(responses[28]);
-    }
-    
-    const cleanedData = JSON.parse(JSON.stringify(formData, (_, value) => 
-      value === null || value === undefined || value === '' || 
-      (Array.isArray(value) && value.length === 0) ||
-      (typeof value === 'object' && value !== null && Object.keys(value).length === 0) ? undefined : value
-    ));
-
-    console.log('Submitting form with data:', cleanedData);
-    
-    try {
-      const response = await axios.post(
-        `http://localhost:5001/api/design-preferences/mock-user-id`,
-        cleanedData,
-        {
-          params: { complete: 'true' },
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-        return optionIds.map(id => getOptionText(questionId, id));
-      };
-
+      // Only use fullName for name input
       const requestData = {
         personalInfo: {
-          firstName: String(responses[1] || '').trim().split(' ')[0] || '',
-          lastName: String(responses[1] || '').trim().split(' ').slice(1).join(' ') || '',
+          fullName: String(responses[1] || '').trim() || '',
           phoneNumber: String(responses[2] || '').trim() || '',
           email: String(responses[3] || '').trim() || ''
-        },
-        demographics: {
-          gender: getMultipleOptionTexts(4, responses[4] as number[]) || [],
-          ethnicity: getMultipleOptionTexts(5, responses[5] as number[]) || [],
-          householdSize: String(getOptionText(6, responses[6] as number) || '').trim() || '',
-          fosterCare: responses[7] === 1,
-          disability: responses[8] === 1,
-          disabilityDetails: String(responses[9] || '').trim() || '',
-        },
-        stylePreferences: {
-          homeMessage: getMultipleOptionTexts(10, responses[10] as number[]) || [],
-          favoriteColors: getMultipleOptionTexts(11, responses[11] as number[]) || [],
-          styleInWords: String(responses[12] || '').trim() || '',
-          styleAdmired: String(responses[13] || '').trim() || '',
-        },
-        comfortFactors: {
-          peacePlace: String(responses[14] || '').trim() || '',
-          peaceScent: getMultipleOptionTexts(15, responses[15] as number[]) || [],
-          fabrics: getMultipleOptionTexts(16, responses[16] as number[]) || [],
-          calmColors: getMultipleOptionTexts(17, responses[17] as number[]) || [],
-        },
-        environmentalPreferences: {
-          artTypes: getMultipleOptionTexts(18, responses[18] as number[]) || [],
-          allergies: responses[19] === 1,
-          allergyDetails: String(responses[20] || '').trim() || '',
-          pets: responses[21] === 1,
-          petDetails: String(responses[22] || '').trim() || '',
-        },
-        personalInterests: {
-          roomWords: getMultipleOptionTexts(23, responses[23] as number[]) || [],
-        },
-        designElements: {
-          patternPreference: String(responses[24] || '').trim() || '',
-          patternTypes: getMultipleOptionTexts(25, responses[25] as number[]) || [],
-          roomWords: getMultipleOptionTexts(26, responses[26] as number[]) || [],
-        },
-        generatedPreferences: {
-          colorPalette: [], // Will be generated by backend
-          moodboardImageUrl: '', // Will be generated by backend
-          suggestedFurniture: [] // Will be generated by backend
-        },
-        additionalNotes: String(responses[28] || '').trim() || '',
+        }
+        // Add other fields as needed, using getMultipleOptionTexts(questionId, responses)
       };
-      
       console.log('Sending request to backend:', requestData);
-      
       // Generate a random userId for each submission
       const randomUserId = 'user_' + Math.random().toString(36).substr(2, 9);
       const finalPayload = {
@@ -294,7 +122,7 @@ const Quiz: FC = () => {
       );
       console.log('Backend response:', response);
       if (response.status === 200 || response.status === 201) {
-        setSubmitted(true);
+        // Handle successful submission
       }
     } catch (error: any) {
       console.error('Error submitting quiz:', error);
@@ -303,20 +131,10 @@ const Quiz: FC = () => {
         console.error('Response status:', error.response.status);
         console.error('Response headers:', error.response.headers);
       }
-      setError(error instanceof Error ? error.message : 'An error occurred while submitting the quiz');
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const getOptionText = (questionId: number, optionId: number): string => {
-    const question = quizQuestions.find((q: Question) => q.id === questionId);
-    const option = question?.options?.find((o: { id: number; name: string }) => o.id === optionId);
-    return option?.name || '';
-  };
-
-  // Is the submit button disabled?
-  const isSubmitDisabled = isSubmitting;
 
   const renderPictureSelectionQuestion = (question: Question) => {
     return (
@@ -402,7 +220,7 @@ const Quiz: FC = () => {
             type={question.inputType || 'text'}
             id={`question-${question.id}`}
             name={`question-${question.id}`}
-            value={responses[question.id] ?? ''}
+            value={String(responses[question.id] ?? '')}
             onChange={(e) => handleTextInput(question.id, e.target.value)}
             className="text-input"
             placeholder={getPlaceholderText()}
@@ -420,7 +238,7 @@ const Quiz: FC = () => {
         <select
           id={`question-${question.id}`}
           name={`question-${question.id}`}
-          value={responses[question.id] ?? ''}
+          value={String(responses[question.id] ?? '')}
           onChange={(e) => handleOptionSelect(question.id, Number(e.target.value))}
           className="dropdown-select"
           required
@@ -438,8 +256,7 @@ const Quiz: FC = () => {
   };
 
   const renderMultiSelectQuestion = (question: Question) => {
-    const selectedOptions = responses[question.id] as number[] || [];
-    
+    const selectedOptions = Array.isArray(responses[question.id]) ? (responses[question.id] as number[]) : [];
     return (
       <div className="multi-select-container">
         <div className="multi-select-options" role="group" aria-labelledby={`question-${question.id}`}>
@@ -450,7 +267,7 @@ const Quiz: FC = () => {
                 id={`question-${question.id}-option-${option.id}`}
                 name={`question-${question.id}`}
                 value={option.id}
-                checked={Array.isArray(responses[question.id]) ? (responses[question.id] as number[]).includes(option.id) : false}
+                checked={selectedOptions.includes(option.id)}
                 onChange={() => handleMultiSelectOption(question.id, option.id)}
                 className="multi-select-checkbox"
               />
@@ -543,7 +360,6 @@ const Quiz: FC = () => {
           >
             Previous
           </button>
-          
           {!isLastQuestion ? (
             <button 
               type="button" 
@@ -563,7 +379,6 @@ const Quiz: FC = () => {
             </button>
           )}
         </div>
-        
         {isSubmitting && (
           <div className="submitting-message">
             Submitting...
