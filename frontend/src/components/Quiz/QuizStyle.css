@@ -472,6 +472,7 @@
   border-radius: 12px;
   font-size: 1.05rem;
   background-color: #fff;
+  color: var(--color-black);
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -491,6 +492,7 @@
 .dropdown-select option {
   padding: 1rem;
   font-size: 1.05rem;
+  color: #000;
 }
 
 .multi-select-container {

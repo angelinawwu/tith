@@ -1,10 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface DesignResultsProps {
   onStartOver: () => void;
 }
 
 const DesignResults: React.FC<DesignResultsProps> = ({ onStartOver }) => {
+  const navigate = useNavigate();
+  
+  const goToLandingPage = () => {
+    navigate('/');
+  };
+  
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold text-gray-800 mb-6">Your Personalized Interior Design Recommendations</h2>
@@ -72,10 +79,10 @@ const DesignResults: React.FC<DesignResultsProps> = ({ onStartOver }) => {
 
       <div className="mt-8 flex justify-center">
         <button
-          onClick={onStartOver}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={goToLandingPage}
+          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
-          Start Over
+          Return Home
         </button>
       </div>
     </div>
