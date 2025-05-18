@@ -4,6 +4,7 @@ import axios from 'axios';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
 import './QuizStyle.css';
+import TextToSpeech from './TextToSpeech';
 
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -21,6 +22,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [autoTTS, setAutoTTS] = useState(false);
 
   useEffect(() => {
     const initialResponses: Record<number, string | number | number[] | null> = {};
@@ -297,7 +299,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
         <select
           id={`question-${question.id}`}
           name={`question-${question.id}`}
-          value={String(responses[question.id] ?? '')}
+          value={responses[question.id] as number || ""}
           onChange={(e) => handleOptionSelect(question.id, Number(e.target.value))}
           className="dropdown-select"
           required
@@ -315,7 +317,8 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   };
 
   const renderMultiSelectQuestion = (question: Question) => {
-    const selectedOptions = Array.isArray(responses[question.id]) ? (responses[question.id] as number[]) : [];
+    const selectedOptions = responses[question.id] as number[] || [];
+    
     return (
       <div className="multi-select-container">
         <div className="multi-select-options" role="group" aria-labelledby={`question-${question.id}`}>
@@ -336,6 +339,11 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
               >
                 <span className="checkmark"></span>
                 <span className="multi-select-label-text">{option.name}</span>
+                <TextToSpeech 
+                  text={option.name} 
+                  size="small" 
+                  className="ml-2"
+                />
               </label>
             </div>
           ))}
@@ -365,6 +373,11 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
               >
                 <span className="radio-mark"></span>
                 <span className="multiple-choice-label-text">{option.name}</span>
+                <TextToSpeech 
+                  text={option.name} 
+                  size="small" 
+                  className="ml-2"
+                />
               </label>
             </div>
           ))}
@@ -395,9 +408,28 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const currentQuestion = quizQuestions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;
 
+  const renderAutoTTSToggle = () => {
+    if (currentQuestionIndex !== 0) return null;
+
+    return (
+      <div className="auto-tts-toggle">
+        <label className="auto-tts-label">
+          <input
+            type="checkbox"
+            checked={autoTTS}
+            onChange={(e) => setAutoTTS(e.target.checked)}
+            className="auto-tts-checkbox"
+          />
+          <span>Enable automatic text-to-speech for all questions</span>
+        </label>
+      </div>
+    );
+  };
+
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
       <form onSubmit={handleSubmit}>
+        {renderAutoTTSToggle()}
         <section 
           ref={questionSectionRef}
           className={`question-section ${isTransitioning ? 
@@ -408,9 +440,17 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
             <h2 id={`question-${currentQuestion.id}`}>
               <span className="question-number">{currentQuestion.number}</span>
             </h2>
-            <p className="question-text">
-              {currentQuestion.description}
-            </p>
+            <div className="question-text-container">
+              <p className="question-text">
+                {currentQuestion.description}
+              </p>
+              <TextToSpeech 
+                text={currentQuestion.description} 
+                allOptions={currentQuestion.options.map(opt => opt.name)}
+                showAllOptions={true}
+                autoRead={autoTTS}
+              />
+            </div>
           </div>
           {renderQuestionContent(currentQuestion)}
         </section>
