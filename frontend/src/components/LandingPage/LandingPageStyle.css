@@ -24,7 +24,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 4rem;
+    padding: 2rem;
     width: 100%;
     margin: 0 auto;
     max-width: 1200px;
@@ -54,7 +54,7 @@
 }
 
 .landing-page-title {
-    font-size: 6rem;
+    font-size: 5rem;
     font-weight: bold;
     color: var(--color-white);
     margin: 0;

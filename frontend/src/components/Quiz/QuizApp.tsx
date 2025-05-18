@@ -470,6 +470,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
                 text={currentQuestion.description} 
                 showAllOptions={false}
                 autoRead={autoTTS}
+                size="medium"
               />
             </div>
           </div>

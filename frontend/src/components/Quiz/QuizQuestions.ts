@@ -257,8 +257,10 @@ const quizQuestions: Question[] = [
     description: 'What kind of light environment do you prefer?',
     options: [
       { id: 1, name: 'Bright Daylight' },
-      { id: 2, name: 'Soft Warm Glow' },
-      { id: 3, name: 'Low Light' },
+      { id: 2, name: '' },
+      { id: 3, name: 'Soft Warm Glow' },
+      { id: 4, name: '' },
+      { id: 5, name: 'Low Light' },
     ],
   },
   {
