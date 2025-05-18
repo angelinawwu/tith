@@ -218,6 +218,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const renderPictureSelectionQuestion = (question: Question) => {
     // For questions 15 and 21, we need to handle multi-select
     const isMultiSelect = question.id === 15 || question.id === 21;
+    const isQuestion15 = question.id === 15;
     let selectedOptions: number[] = [];
     
     if (isMultiSelect) {
@@ -247,7 +248,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
           </div>
         )}
         <div 
-          className="picture-selection-options" 
+          className={`picture-selection-options ${isQuestion15 ? 'question15-options' : ''}`}
           role={isMultiSelect ? "group" : "radiogroup"} 
           aria-labelledby={`question-${question.id}`}
         > 
@@ -255,7 +256,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
             const isSelected = selectedOptions.includes(option.id);
             
             return (
-              <div key={option.id} className="picture-option">
+              <div key={option.id} className={`picture-option ${isQuestion15 ? 'question15-option' : ''}`}>
                 <input
                   type={isMultiSelect ? "checkbox" : "radio"}
                   id={`${question.id}-${option.id}`}
@@ -273,20 +274,20 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
                 />
                 <label
                   htmlFor={`${question.id}-${option.id}`}
-                  className={`picture-option-label ${isSelected ? 'selected' : ''}`}
+                  className={`picture-option-label ${isSelected ? 'selected' : ''} ${isQuestion15 ? 'question15-label' : ''}`}
                 >
                   {option.imageUrl ? (
                     <img 
                       src={option.imageUrl} 
                       alt={option.altText || option.name} 
-                      className="option-image" 
+                      className={`option-image ${isQuestion15 ? 'question15-image' : ''}`}
                     />
                   ) : (
                     <div className="option-image-placeholder">
                       <span>{option.name.charAt(0)}</span>
                     </div>
                   )}
-                  {option.description && <span className="option-text">{option.description}</span>}
+                  {option.description && !isQuestion15 && <span className="option-text">{option.description}</span>}
                 </label>
               </div>
             );

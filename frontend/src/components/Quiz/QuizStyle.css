@@ -1066,4 +1066,29 @@
   font-style: italic;
   text-align: right;
   padding-right: 1rem;
+}
+
+/* Question 15 specific styles */
+.question15-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.question15-option {
+  aspect-ratio: 1/1;
+}
+
+.question15-label {
+  min-height: unset;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+}
+
+.question15-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 6px;
 } 
