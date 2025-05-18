@@ -5,6 +5,7 @@ import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
 import './QuizStyle.css';
 import TextToSpeech from './TextToSpeech';
+import DesignResults from '../DesignResults/DesignResults';
 
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -23,6 +24,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const [autoTTS, setAutoTTS] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
+  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
     const initialResponses: Record<number, string | number | number[] | null> = {};
@@ -135,17 +137,14 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
     setIsSubmitting(true);
     try {
       console.log('Submitting quiz responses:', responses);
-      // Only use fullName for name input
       const requestData = {
         personalInfo: {
           fullName: String(responses[1] || '').trim() || '',
           phoneNumber: String(responses[2] || '').trim() || '',
           email: String(responses[3] || '').trim() || ''
         }
-        // Add other fields as needed, using getMultipleOptionTexts(questionId, responses)
       };
       console.log('Sending request to backend:', requestData);
-      // Generate a random userId for each submission
       const randomUserId = 'user_' + Math.random().toString(36).substr(2, 9);
       const finalPayload = {
         userId: randomUserId,
@@ -158,7 +157,8 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
       );
       console.log('Backend response:', response);
       if (response.status === 200 || response.status === 201) {
-        // Handle successful submission
+        // Show results page after successful submission
+        setSubmitted(true);
       }
     } catch (error: any) {
       console.error('Error submitting quiz:', error);
@@ -167,6 +167,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
         console.error('Response status:', error.response.status);
         console.error('Response headers:', error.response.headers);
       }
+      setError('Failed to submit quiz. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -447,6 +448,10 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
       </div>
     );
   };
+
+  if (submitted) {
+    return <DesignResults onStartOver={() => setSubmitted(false)} />;
+  }
 
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
