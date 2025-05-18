@@ -9,6 +9,7 @@ interface TextToSpeechProps {
   allOptions?: string[];
   showAllOptions?: boolean;
   autoRead?: boolean;
+  showLabel?: boolean;
 }
 
 const TextToSpeech: React.FC<TextToSpeechProps> = ({ 
@@ -17,7 +18,8 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({
   className = '',
   allOptions,
   showAllOptions = false,
-  autoRead = false
+  autoRead = false,
+  showLabel = true
 }) => {
   const speak = (textToSpeak: string) => {
     if ('speechSynthesis' in window) {
@@ -73,15 +75,17 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({
 
   return (
     <div className="tts-container">
-      <button
-        onClick={() => speak(text)}
-        className={`speaker-button ${sizeClasses[size]} ${className}`}
-        aria-label="Read question aloud"
-        title="Read question aloud"
-      >
-        <FaVolumeUp />
-        {/* <span className="tts-label">Read Question</span> */}
-      </button>
+      {text && (
+        <button
+          onClick={() => speak(text)}
+          className={`speaker-button ${sizeClasses[size]} ${className}`}
+          aria-label="Read question aloud"
+          title="Read question aloud"
+        >
+          <FaVolumeUp />
+          {showLabel && <span className="tts-label">Read Question</span>}
+        </button>
+      )}
       {allOptions && showAllOptions && (
         <button
           onClick={speakAllOptions}
@@ -90,7 +94,7 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({
           title="Read all options"
         >
           <FaList />
-          {/* <span className="tts-label">Read All Options</span> */}
+          {showLabel && <span className="tts-label">Read All Options</span>}
         </button>
       )}
     </div>

@@ -27,8 +27,8 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   useEffect(() => {
     const initialResponses: Record<number, string | number | number[] | null> = {};
     quizQuestions.forEach((question: Question) => {
-      if (question.type === 'text' ||
-          (question as { inputType?: string }).inputType === 'email' ||
+      if (question.type === 'text' || 
+          (question as { inputType?: string }).inputType === 'email' || 
           (question as { inputType?: string }).inputType === 'tel') {
         initialResponses[question.id] = '';
       } else if (question.type === 'multiSelect') {
@@ -108,13 +108,13 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
       }
     }, 300);
   };
-  
+
   const goToNextQuestion = () => {
     if (currentQuestionIndex < quizQuestions.length - 1 && !isTransitioning) {
       animateQuestionTransition(currentQuestionIndex + 1, 'next');
     }
   };
-  
+
   const goToPreviousQuestion = () => {
     if (currentQuestionIndex > 0 && !isTransitioning) {
       animateQuestionTransition(currentQuestionIndex - 1, 'prev');
@@ -147,7 +147,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     return currentQuestion.required && !isCurrentQuestionAnswered();
   }, [currentQuestionIndex, isCurrentQuestionAnswered]);
-
+  
   const isSubmitDisabled = isSubmitting;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -194,39 +194,48 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
 
   const renderPictureSelectionQuestion = (question: Question) => {
     return (
-      <div className="picture-selection-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
-        {question.options.map((option) => (
-          <div key={option.id} className="picture-option">
-            <input
-              type="radio"
-              id={`${question.id}-${option.id}`}
-              name={`question-${question.id}`}
-              value={option.id}
-              checked={responses[question.id] === option.id}
-              onChange={() => handleOptionSelect(question.id, option.id)}
-              className="hidden"
-            />
-            <label
-              htmlFor={`${question.id}-${option.id}`}
-              className={`picture-option-label ${
-                responses[question.id] === option.id ? 'selected' : ''
-              }`}
-            >
-              {option.imageUrl ? (
-                <img 
-                  src={option.imageUrl} 
-                  alt={option.altText || option.name} 
-                  className="option-image" 
-                />
-              ) : (
-                <div className="option-image-placeholder">
-                  <span>{option.name.charAt(0)}</span>
-                </div>
-              )}
-              {option.description && <span className="option-text">{option.description}</span>}
-            </label>
-          </div>
-        ))}
+      <div className="picture-selection-options-container">
+        <TextToSpeech
+          text=""
+          allOptions={question.options.map(opt => opt.name)}
+          showAllOptions={true}
+          showLabel={true}
+          size="medium"
+        />
+        <div className="picture-selection-options" role="radiogroup" aria-labelledby={`question-${question.id}`}> 
+          {question.options.map((option) => (
+            <div key={option.id} className="picture-option">
+              <input
+                type="radio"
+                id={`${question.id}-${option.id}`}
+                name={`question-${question.id}`}
+                value={option.id}
+                checked={responses[question.id] === option.id}
+                onChange={() => handleOptionSelect(question.id, option.id)}
+                className="hidden"
+              />
+              <label
+                htmlFor={`${question.id}-${option.id}`}
+                className={`picture-option-label ${
+                  responses[question.id] === option.id ? 'selected' : ''
+                }`}
+              >
+                {option.imageUrl ? (
+                  <img 
+                    src={option.imageUrl} 
+                    alt={option.altText || option.name} 
+                    className="option-image" 
+                  />
+                ) : (
+                  <div className="option-image-placeholder">
+                    <span>{option.name.charAt(0)}</span>
+                  </div>
+                )}
+                {option.description && <span className="option-text">{option.description}</span>}
+              </label>
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
@@ -234,12 +243,19 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const renderScaleQuestion = (question: Question) => {
     return (
       <div className="scale-slider-container">
+        <TextToSpeech
+          text=""
+          allOptions={question.options?.map(opt => opt.name) || []}
+          showAllOptions={true}
+          showLabel={true}
+          size="medium"
+        />
         <div className="scale-labels">
           {question.options?.map((option) => (
             <span key={option.id}>{option.name}</span>
           ))}
         </div>
-        <div className="scale-slider" role="group" aria-labelledby={`question-${question.id}`}>
+        <div className="scale-slider" role="group" aria-labelledby={`question-${question.id}`}> 
           {question.options?.map((option) => (
             <div key={option.id} className="scale-option">
               <input
@@ -299,6 +315,13 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const renderDropdownQuestion = (question: Question) => {
     return (
       <div className="dropdown-container">
+        <TextToSpeech
+          text=""
+          allOptions={question.options.map(opt => opt.name)}
+          showAllOptions={true}
+          showLabel={true}
+          size="medium"
+        />
         <select
           id={`question-${question.id}`}
           name={`question-${question.id}`}
@@ -324,6 +347,13 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
     
     return (
       <div className="multi-select-container">
+        <TextToSpeech
+          text=""
+          allOptions={question.options.map(opt => opt.name)}
+          showAllOptions={true}
+          showLabel={true}
+          size="medium"
+        />
         <div className="multi-select-options" role="group" aria-labelledby={`question-${question.id}`}>
           {question.options.map((option) => (
             <div key={option.id} className="multi-select-option">
@@ -346,6 +376,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
                   text={option.name} 
                   size="small" 
                   className="ml-2"
+                  showLabel={false}
                 />
               </label>
             </div>
@@ -358,7 +389,14 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const renderMultipleChoiceQuestion = (question: Question) => {
     return (
       <div className="multiple-choice-container">
-        <div className="multiple-choice-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
+        <TextToSpeech
+          text=""
+          allOptions={question.options.map(opt => opt.name)}
+          showAllOptions={true}
+          showLabel={true}
+          size="medium"
+        />
+        <div className="multiple-choice-options" role="radiogroup" aria-labelledby={`question-${question.id}`}> 
           {question.options.map((option) => (
             <div key={option.id} className="multiple-choice-option">
               <input
@@ -380,6 +418,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
                   text={option.name} 
                   size="small" 
                   className="ml-2"
+                  showLabel={false}
                 />
               </label>
             </div>
@@ -444,13 +483,12 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
               <span className="question-number">{currentQuestion.number}</span>
             </h2>
             <div className="question-text-container">
-              <p className="question-text">
-                {currentQuestion.description}
-              </p>
+            <p className="question-text">
+              {currentQuestion.description}
+            </p>
               <TextToSpeech 
                 text={currentQuestion.description} 
-                allOptions={currentQuestion.options.map(opt => opt.name)}
-                showAllOptions={true}
+                showAllOptions={false}
                 autoRead={autoTTS}
               />
             </div>
@@ -459,14 +497,14 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
         </section>
 
         <div className="navigation-container">
-          <button 
-            type="button" 
-            className="nav-button prev-button"
-            onClick={goToPreviousQuestion}
+            <button 
+              type="button" 
+              className="nav-button prev-button"
+              onClick={goToPreviousQuestion}
             disabled={currentQuestionIndex === 0 || isTransitioning}
-          >
-            Previous
-          </button>
+            >
+              Previous
+            </button>
           
           {!isLastQuestion ? (
             <button 

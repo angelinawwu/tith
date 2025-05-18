@@ -590,6 +590,11 @@
   color: var(--color-yellow);
   transition: all 0.2s ease;
   border-radius: 50%;
+  gap: 0.4em;
+}
+
+.speaker-button .tts-label {
+  margin-left: 0.4em;
 }
 
 .speaker-button:hover {
@@ -870,4 +875,9 @@
 
 .auto-tts-checkbox:hover {
   border-color: var(--color-yellow);
+}
+
+/* For answer choices, add spacing between the icon and the answer text */
+.ml-2 {
+  margin-left: 0.5em;
 } 
