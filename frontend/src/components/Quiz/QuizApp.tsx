@@ -190,7 +190,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const renderPictureSelectionQuestion = (question: Question) => {
     return (
       <div className="picture-selection-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
-        {question.options?.map((option: { id: number; name: string; imageUrl?: string }) => (
+        {question.options.map((option) => (
           <div key={option.id} className="picture-option">
             <input
               type="radio"
@@ -207,8 +207,16 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
                 responses[question.id] === option.id ? 'selected' : ''
               }`}
             >
-              {option.imageUrl && (
-                <img src={option.imageUrl} alt={option.name} className="option-image" />
+              {option.imageUrl ? (
+                <img 
+                  src={option.imageUrl} 
+                  alt={option.altText || option.name} 
+                  className="option-image" 
+                />
+              ) : (
+                <div className="option-image-placeholder">
+                  <span>{option.name.charAt(0)}</span>
+                </div>
               )}
               <span className="option-text">{option.name}</span>
             </label>

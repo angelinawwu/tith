@@ -6,6 +6,8 @@ export interface QuestionOption {
   id: number;
   name: string;
   description?: string;
+  imageUrl?: string;
+  altText?: string;
 }
 
 // Question interface
@@ -184,18 +186,22 @@ const quizQuestions: Question[] = [
   },
   {
     id: 15,
-    type: 'multiSelect',
+    type: 'pictureSelection',
     number: 15,
     title: 'Ideal Home Images',
     description: 'Select up to 3 images that match your ideal home:',
     options: [
-      { id: 1, name: 'Warm and welcoming' },
-      { id: 2, name: 'Elegant, stately, and refined' },
-      { id: 3, name: 'Unconventional, artistic, and original' },
-      { id: 4, name: 'Minimal and businesslike' },
-      { id: 5, name: 'Glamorous and luxurious' },
-      { id: 6, name: 'Casual and comfortable' },
-      { id: 7, name: 'Prefer not to say' },
+      { id: 1, name: 'Modern Colorful Midcentury', imageUrl: '/images/Interiors/p1-modernColorfulMidcentury.png', altText: 'Mid-century modern living room with a curved rust-colored velvet sofa, teal accent wall, and large pleated fan wall art creating a warm, stylish atmosphere.' },
+      { id: 2, name: 'Clean Modern Beige', imageUrl: '/images/Interiors/p2-cleanModernBeige.webp', altText: 'Minimalist living room with a curved cream sofa, abstract black-and-white wall art, sculptural floor lamp, and low round wooden coffee tables in soft natural lighting.' },
+      { id: 3, name: 'Colorful Cheerful Spunky', imageUrl: '/images/Interiors/p3-ColorfulCheerfulSpunky.jpg', altText: 'Bright eclectic living space with yellow walls, colorful pillows, patterned rugs, and exposed wood beams creating a warm, lively, and inviting Southwestern atmosphere.' },
+      { id: 4, name: 'Eccentric Personable Homey Messy', imageUrl: '/images/Interiors/p4-eccentricPersonableHomeyMessy.jpg', altText: 'Bohemian-style living room with turquoise walls, an ornate fireplace mantle, vibrant textiles, and layered decor featuring candles, flowers, and eclectic artwork.' },
+      { id: 5, name: 'Colorful Modern Artsy', imageUrl: '/images/Interiors/p5-colorfulModernArtsy.jpg', altText: 'Contemporary living room with burgundy leather sectional sofa, geometric patterned pillows in bright colors, and a clean, white wall backdrop with neutral accents.' },
+      { id: 6, name: 'Eccentric Bright Vibrant Earthy', imageUrl: '/images/Interiors/p6-eccentricBrightVibrantEarthy.jpg', altText: 'Modern dining room with a dark wood table, orange upholstered chairs, and large globe pendant lights, framed by floor-to-ceiling glass doors and patterned rug.' },
+      { id: 7, name: 'Clean Airy Bright Modern', imageUrl: '/images/Interiors/p7-cleanAiryBrightModern.jpg', altText: 'Minimalist open-plan living room and kitchen with a soft beige sectional sofa, sleek white cabinetry, and natural light filling the space, creating a calm, airy vibe.' },
+      { id: 8, name: 'Classy Modern Clean', imageUrl: '/images/Interiors/p9-classyModernClean.jpg', altText: 'Bright dining room with a round white table, mix of black and white chairs, abstract artwork, and a fiddle leaf fig plant adding greenery to the modern decor.' },
+      { id: 9, name: 'Soft Bright Homey', imageUrl: '/images/Interiors/p10-softBrightHomey.jpg', altText: 'Mid-century inspired living room with a textured cream sectional sofa, black triangular coffee table, and open kitchen in the background, styled with soft neutral tones and layered books and objects.' },
+      { id: 10, name: 'Colorful Spunky Modern', imageUrl: '/images/Interiors/p11-colorfulSpunkyModern.jpg', altText: 'Sunlit living room filled with potted plants, colorful modern artwork, a gray sectional sofa, and warm wood furniture, blending mid-century and eclectic styles.' },
+      { id: 11, name: 'Colorful Open Airy', imageUrl: '/images/Interiors/p12-colorfulOpenAiry.webp', altText: 'Spanish-inspired living room with arched windows, terracotta floors, a white sofa with bold pink and orange accent pillows. Ornate ceramic lamps on a carved wooden table give a rustic feel to the interior.' },
     ],
   },
   {
