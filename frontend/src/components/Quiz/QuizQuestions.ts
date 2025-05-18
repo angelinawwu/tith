@@ -240,13 +240,13 @@ const quizQuestions: Question[] = [
     title: 'Comfort Colors',
     description: 'What colors bring a sense of calm or comfort to you?',
     options: [
-      { id: 1, name: 'Brights - Reds, yellows, blues' },
-      { id: 2, name: 'Neutrals - navy, gray, beige, tan' },
-      { id: 3, name: 'Subtle - cream, taupe, gray, burgundy' },
-      { id: 4, name: 'Lights - pastels, pinks, pale blues, ivory, lavender' },
-      { id: 5, name: 'Daring - red, hot pink, black/white' },
-      { id: 6, name: 'Offbeat - mustard, chartreuse, plum, magenta' },
-      { id: 7, name: 'Contrasting - black, white, royal blue, red' },
+      { id: 1, name: 'Brights - Reds, yellows, blues', description: 'Brights - Reds, yellows, blues', imageUrl: '/images/colorpalettes/bright.png', altText: 'Brights - Reds, yellows, blues' },
+      { id: 2, name: 'Neutrals - navy, gray, beige, tan', description: 'Neutrals - navy, gray, beige, tan', imageUrl: '/images/colorpalettes/neutrals.png', altText: 'Neutrals - navy, gray, beige, tan' },
+      { id: 3, name: 'Subtle - cream, taupe, gray, burgundy', description: 'Subtle - cream, taupe, gray, burgundy', imageUrl: '/images/colorpalettes/subtle.png', altText: 'Subtle - cream, taupe, gray, burgundy' },
+      { id: 4, name: 'Lights - pastels, pinks, pale blues, ivory, lavender', description: 'Lights - pastels, pinks, pale blues, ivory, lavender', imageUrl: '/images/colorpalettes/lights.png', altText: 'Lights - pastels, pinks, pale blues, ivory, lavender' },
+      { id: 5, name: 'Daring - red, hot pink, black/white', description: 'Daring - red, hot pink, black/white', imageUrl: '/images/colorpalettes/daring.png', altText: 'Daring - red, hot pink, black/white' },
+      { id: 6, name: 'Offbeat - mustard, chartreuse, plum, magenta', description: 'Offbeat - mustard, chartreuse, plum, magenta', imageUrl: '/images/colorpalettes/offbeat.png', altText: 'Offbeat - mustard, chartreuse, plum, magenta' },
+      { id: 7, name: 'Contrasting - black, white, royal blue, red', description: 'Contrasting - black, white, royal blue, red', imageUrl: '/images/colorpalettes/contrasting.png', altText: 'Contrasting - black, white, royal blue, red' },
     ]
   },
   {
