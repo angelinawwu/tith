@@ -82,7 +82,6 @@ app.use('/api/design-preferences', designPreferencesRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/style-quiz', styleQuizRoutes);
 
-<<<<<<< HEAD
 // Design generation endpoints
 app.post('/api/v1/designs/generate', designGenerationController.generateDesign);
 app.get('/api/v1/designs/:designId/recommendations', designGenerationController.getDesignRecommendations);
@@ -95,7 +94,8 @@ app.get('/api/design-recommendations', designController.getDesignRecommendations
 app.use((err, req, res, next) => {
   console.error('Express error:', err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
-=======
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     const health = {
@@ -105,16 +105,6 @@ app.get('/health', (req, res) => {
         database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
     };
     res.status(200).json(health);
->>>>>>> origin/main
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Express error:', err.stack);
-    res.status(500).json({ 
-        message: 'Something went wrong!',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
 });
 
 const PORT = process.env.PORT || 5000;
