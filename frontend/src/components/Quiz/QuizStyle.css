@@ -812,7 +812,15 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.picture-option input[type="radio"]:checked + .picture-option-label {
+.picture-option-label.selected {
+  border-color: var(--color-yellow);
+  background-color: rgba(255, 193, 7, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.picture-option input[type="radio"]:checked + .picture-option-label,
+.picture-option input[type="checkbox"]:checked + .picture-option-label {
   border-color: var(--color-yellow);
   background-color: rgba(255, 193, 7, 0.1);
   transform: translateY(-2px);
@@ -1002,4 +1010,14 @@
 /* For answer choices, add spacing between the icon and the answer text */
 .ml-2 {
   margin-left: 0.5em;
+}
+
+.selection-limit-note {
+  font-size: 0.9rem;
+  color: var(--color-black);
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background-color: rgba(255, 193, 7, 0.1);
+  border-radius: 4px;
+  text-align: center;
 } 

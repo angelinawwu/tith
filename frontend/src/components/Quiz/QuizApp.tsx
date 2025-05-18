@@ -33,7 +33,8 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
           (question as { inputType?: string }).inputType === 'email' || 
           (question as { inputType?: string }).inputType === 'tel') {
         initialResponses[question.id] = '';
-      } else if (question.type === 'multiSelect') {
+      } else if (question.type === 'multiSelect' || 
+                (question.type === 'pictureSelection' && (question.id === 15 || question.id === 21))) {
         initialResponses[question.id] = [];
       } else {
         initialResponses[question.id] = null;
@@ -65,6 +66,11 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
           [questionId]: currentSelections.filter(id => id !== optionId)
         };
       } else {
+        // For questions 15 and 21, limit to 3 selections
+        if ((questionId === 15 || questionId === 21) && currentSelections.length >= 3) {
+          console.log("Maximum 3 selections allowed");
+          return prev; // Don't add more than 3 selections
+        }
         return {
           ...prev,
           [questionId]: [...currentSelections, optionId]
@@ -117,7 +123,8 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
     if (response === null || response === undefined) return false;
     if (currentQuestion.type === 'text') {
       return typeof response === 'string' && response.trim() !== '';
-    } else if (currentQuestion.type === 'multiSelect') {
+    } else if (currentQuestion.type === 'multiSelect' || 
+               (currentQuestion.type === 'pictureSelection' && (currentQuestion.id === 15 || currentQuestion.id === 21))) {
       return Array.isArray(response) && response.length > 0;
     } else if (currentQuestion.type === 'multipleChoice') {
       return response !== null && response !== undefined;
@@ -174,6 +181,22 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   };
 
   const renderPictureSelectionQuestion = (question: Question) => {
+    // For questions 15 and 21, we need to handle multi-select
+    const isMultiSelect = question.id === 15 || question.id === 21;
+    let selectedOptions: number[] = [];
+    
+    if (isMultiSelect) {
+      // For multi-select, make sure we have an array
+      selectedOptions = Array.isArray(responses[question.id]) 
+        ? (responses[question.id] as number[]) 
+        : [];
+    } else {
+      // For single-select, convert to array for consistent handling
+      selectedOptions = responses[question.id] !== null 
+        ? [responses[question.id] as number] 
+        : [];
+    }
+    
     return (
       <div className="picture-selection-options-container">
         <TextToSpeech
@@ -183,39 +206,56 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
           showLabel={true}
           size="medium"
         />
-        <div className="picture-selection-options" role="radiogroup" aria-labelledby={`question-${question.id}`}> 
-          {question.options.map((option) => (
-            <div key={option.id} className="picture-option">
-              <input
-                type="radio"
-                id={`${question.id}-${option.id}`}
-                name={`question-${question.id}`}
-                value={option.id}
-                checked={responses[question.id] === option.id}
-                onChange={() => handleOptionSelect(question.id, option.id)}
-                className="hidden"
-              />
-              <label
-                htmlFor={`${question.id}-${option.id}`}
-                className={`picture-option-label ${
-                  responses[question.id] === option.id ? 'selected' : ''
-                }`}
-              >
-                {option.imageUrl ? (
-                  <img 
-                    src={option.imageUrl} 
-                    alt={option.altText || option.name} 
-                    className="option-image" 
-                  />
-                ) : (
-                  <div className="option-image-placeholder">
-                    <span>{option.name.charAt(0)}</span>
-                  </div>
-                )}
-                {option.description && <span className="option-text">{option.description}</span>}
-              </label>
-            </div>
-          ))}
+        {isMultiSelect && (
+          <div className="selection-limit-note">
+            Select up to 3 options
+          </div>
+        )}
+        <div 
+          className="picture-selection-options" 
+          role={isMultiSelect ? "group" : "radiogroup"} 
+          aria-labelledby={`question-${question.id}`}
+        > 
+          {question.options.map((option) => {
+            const isSelected = selectedOptions.includes(option.id);
+            
+            return (
+              <div key={option.id} className="picture-option">
+                <input
+                  type={isMultiSelect ? "checkbox" : "radio"}
+                  id={`${question.id}-${option.id}`}
+                  name={`question-${question.id}`}
+                  value={option.id}
+                  checked={isSelected}
+                  onChange={() => {
+                    if (isMultiSelect) {
+                      handleMultiSelectOption(question.id, option.id);
+                    } else {
+                      handleOptionSelect(question.id, option.id);
+                    }
+                  }}
+                  className="hidden"
+                />
+                <label
+                  htmlFor={`${question.id}-${option.id}`}
+                  className={`picture-option-label ${isSelected ? 'selected' : ''}`}
+                >
+                  {option.imageUrl ? (
+                    <img 
+                      src={option.imageUrl} 
+                      alt={option.altText || option.name} 
+                      className="option-image" 
+                    />
+                  ) : (
+                    <div className="option-image-placeholder">
+                      <span>{option.name.charAt(0)}</span>
+                    </div>
+                  )}
+                  {option.description && <span className="option-text">{option.description}</span>}
+                </label>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
