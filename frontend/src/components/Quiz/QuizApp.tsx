@@ -48,7 +48,10 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   }, [currentQuestionIndex, onQuestionChange]);
 
   const handleOptionSelect = (questionId: number, optionId: number) => {
-    setResponses((prev) => ({ ...prev, [questionId]: optionId }));
+    setResponses((prev) => ({
+      ...prev,
+      [questionId]: prev[questionId] === optionId ? null : optionId
+    }));
   };
 
   const handleMultiSelectOption = (questionId: number, optionId: number) => {
@@ -220,7 +223,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
                   <span>{option.name.charAt(0)}</span>
                 </div>
               )}
-              <span className="option-text">{option.name}</span>
+              {option.description && <span className="option-text">{option.description}</span>}
             </label>
           </div>
         ))}
