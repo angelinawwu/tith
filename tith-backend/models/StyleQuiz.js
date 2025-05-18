@@ -6,25 +6,8 @@ const styleQuizSchema = new mongoose.Schema({
         required: true
     },
     responses: {
-        preferredRooms: [{
-            imageId: String,
-            description: String,
-            selected: Boolean
-        }],
-        textures: [{
-            type: String,
-            enum: ['soft', 'rough', 'smooth', 'textured', 'natural', 'synthetic']
-        }],
-        safetyFactors: [{
-            type: String,
-            enum: ['lighting', 'space', 'furniture', 'colors', 'textures', 'layout']
-        }],
-        culturalPreferences: [{
-            type: String
-        }],
-        accessibilityNeeds: [{
-            type: String
-        }]
+        type: mongoose.Schema.Types.Mixed,
+        required: true
     },
     summary: {
         type: String,

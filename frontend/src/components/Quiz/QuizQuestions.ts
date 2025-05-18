@@ -6,6 +6,8 @@ export interface QuestionOption {
   id: number;
   name: string;
   description?: string;
+  imageUrl?: string;
+  altText?: string;
 }
 
 // Question interface
@@ -74,15 +76,13 @@ const quizQuestions: Question[] = [
     title: 'Ethnicity',
     description: 'Ethnicity (select all that apply)',
     options: [
-      { id: 1, name: 'Asian' },
+      { id: 1, name: 'Latinx/Hispanic' },
       { id: 2, name: 'Black/African American' },
-      { id: 3, name: 'Latinx/Hispanic' },
-      { id: 4, name: 'Middle Eastern' },
-      { id: 5, name: 'Indigenous/Native American or Alaska Native' },
-      { id: 6, name: 'Native Hawaiian or Other Pacific Islander' },
-      { id: 7, name: 'White' },
-      { id: 8, name: 'Mixed Race' },
-      { id: 9, name: 'Unknown/Prefer not to say' },
+      { id: 3, name: 'Pacific Islander' },
+      { id: 4, name: 'Asian' },
+      { id: 5, name: 'Caucasian' },
+      { id: 6, name: 'Indigenous/Native American' },
+      { id: 7, name: 'Prefer not to answer' },
     ],
   },
   {
@@ -102,6 +102,39 @@ const quizQuestions: Question[] = [
     id: 7,
     type: 'dropdown',
     number: 7,
+    title: 'Children in Household',
+    description: 'How many children will you be living with (if any)?',
+    options: [
+      { id: 1, name: '0' },
+      { id: 2, name: '1' },
+      { id: 3, name: '2' },
+      { id: 4, name: '3+' },
+    ],
+  },
+  {
+    id: 8,
+    type: 'dropdown',
+    number: 8,
+    title: 'Pets in Household',
+    description: 'Do you have any pets?',
+    options: [
+      { id: 1, name: 'Yes' },
+      { id: 2, name: 'No' },
+    ],
+  },
+  {
+    id: 9,
+    type: 'text',
+    number: 9,
+    title: 'Pets Information',
+    description: 'If yes, please list type(s) and how many:',
+    options: [],
+    inputType: 'text'
+  },
+  {
+    id: 10,
+    type: 'dropdown',
+    number: 10,
     title: 'Foster Care Experience',
     description: 'Have you ever been placed in Foster Care?',
     options: [
@@ -111,11 +144,11 @@ const quizQuestions: Question[] = [
     ],
   },
   {
-    id: 8,
+    id: 11,
     type: 'dropdown',
-    number: 8,
+    number: 11,
     title: 'Disability Status',
-    description: 'Do you experience any type of disability?',
+    description: 'Does anyone in your household experience any type of disability?',
     options: [
       { id: 1, name: 'Yes' },
       { id: 2, name: 'No' },
@@ -123,78 +156,115 @@ const quizQuestions: Question[] = [
     ],
   },
   {
-    id: 9,
-    type: 'text',
-    number: 9,
-    title: 'Disability Type',
-    description: 'If you answered yes to the answer above, please let us know which disability/disabilities, so we can best accommodate you.',
-    options: [],
-    inputType: 'text'
-  },
-  {
-    id: 10,
-    type: 'multiSelect',
-    number: 10,
-    title: 'Message',
-    description: 'What message would you like your home to communicate?',
-    options: [
-      { id: 1, name: 'Warm and welcoming' },
-      { id: 2, name: 'Elegant, stately, and refined' },
-      { id: 3, name: 'Unconventional, artistic, and original' },
-      { id: 4, name: 'Minimal and businesslike' },
-      { id: 5, name: 'Glamorous and luxurious' },
-      { id: 6, name: 'Casual and comfortable' },
-      { id: 7, name: 'Prefer not to say' },
-    ],
-  },
-  {
-    id: 11,
-    type: 'pictureSelection',
-    number: 11,
-    title: 'Favorite Colors',
-    description: 'What are your favorite colors?',
-    options: [
-      { id: 1, name: 'Brights - Reds, yellows, blues' },
-      { id: 2, name: 'Neutrals - navy, gray, beige, tan' },
-      { id: 3, name: 'Subtle - cream, taupe, gray, burgundy' },
-      { id: 4, name: 'Lights - pastels, pinks, pale blues, ivory, lavender' },
-      { id: 5, name: 'Daring - red, hot pink, black/white' },
-      { id: 6, name: 'Offbeat - mustard, chartreuse, plum, magenta' },
-      { id: 7, name: 'Contrasting - black, white, royal blue, red' },
-      { id: 8, name: 'Prefer not to say' },
-    ]
-  },
-  {
     id: 12,
     type: 'text',
     number: 12,
-    title: 'Style Description',
-    description: 'Describe your style in three words.',
+    title: 'Disability Type',
+    description: 'If yes, please describe any accessibility needs or accommodations that would help your household (e.g., low furniture, non-slip rugs, quiet appliances):',
     options: [],
     inputType: 'text'
   },
   {
     id: 13,
-    type: 'text',
+    type: 'dropdown',
     number: 13,
-    title: 'Style Inspiration',
-    description: 'Whose style do you admire? ( friend, celebrity, etc.) What is it about their style that you admire?',
-    options: [],
-    inputType: 'text'
+    title: 'Allergies',
+    description: 'Are you allergic to any scents, plants, or fabrics?',
+    options: [
+        { id: 1, name: 'Yes' },
+        { id: 2, name: 'No' },
+    ],
   },
   {
     id: 14,
     type: 'text',
     number: 14,
-    title: 'Favorite Place',
-    description: 'Where do you feel the most at peace?',
+    title: 'Allergy Information',
+    description: 'If yes, please describe your allergies:',
     options: [],
     inputType: 'text'
   },
   {
     id: 15,
-    type: 'multiSelect',
+    type: 'pictureSelection',
     number: 15,
+    title: 'Ideal Home Images',
+    description: 'Select up to 3 images that match your ideal home:',
+    options: [
+      { id: 1, name: '', imageUrl: '/images/Interiors/p1-modernColorfulMidcentury.png', altText: 'Mid-century modern living room with a curved rust-colored velvet sofa, teal accent wall, and large pleated fan wall art creating a warm, stylish atmosphere.' },
+      { id: 2, name: 'Clean Modern Beige', imageUrl: '/images/Interiors/p2-cleanModernBeige.webp', altText: 'Minimalist living room with a curved cream sofa, abstract black-and-white wall art, sculptural floor lamp, and low round wooden coffee tables in soft natural lighting.' },
+      { id: 3, name: 'Colorful Cheerful Spunky', imageUrl: '/images/Interiors/p3-ColorfulCheerfulSpunky.jpg', altText: 'Bright eclectic living space with yellow walls, colorful pillows, patterned rugs, and exposed wood beams creating a warm, lively, and inviting Southwestern atmosphere.' },
+      { id: 4, name: 'Eccentric Personable Homey Messy', imageUrl: '/images/Interiors/p4-eccentricPersonableHomeyMessy.jpg', altText: 'Bohemian-style living room with turquoise walls, an ornate fireplace mantle, vibrant textiles, and layered decor featuring candles, flowers, and eclectic artwork.' },
+      { id: 5, name: 'Colorful Modern Artsy', imageUrl: '/images/Interiors/p5-colorfulModernArtsy.jpg', altText: 'Contemporary living room with burgundy leather sectional sofa, geometric patterned pillows in bright colors, and a clean, white wall backdrop with neutral accents.' },
+      { id: 6, name: 'Eccentric Bright Vibrant Earthy', imageUrl: '/images/Interiors/p6-eccentricBrightVibrantEarthy.jpg', altText: 'Modern dining room with a dark wood table, orange upholstered chairs, and large globe pendant lights, framed by floor-to-ceiling glass doors and patterned rug.' },
+      { id: 7, name: 'Clean Airy Bright Modern', imageUrl: '/images/Interiors/p7-cleanAiryBrightModern.jpg', altText: 'Minimalist open-plan living room and kitchen with a soft beige sectional sofa, sleek white cabinetry, and natural light filling the space, creating a calm, airy vibe.' },
+      { id: 8, name: 'Green Bright Airy', imageUrl: '/images/Interiors/p8-greenBrightAiry.avif', altText: 'A bright, cozy living space with green walls, large windows letting in natural light, and comfortable furniture arranged for relaxation.' },
+      { id: 9, name: 'Classy Modern Clean', imageUrl: '/images/Interiors/p9-classyModernClean.jpg', altText: 'Bright dining room with a round white table, mix of black and white chairs, abstract artwork, and a fiddle leaf fig plant adding greenery to the modern decor.' },
+      { id: 10, name: 'Soft Bright Homey', imageUrl: '/images/Interiors/p10-softBrightHomey.jpg', altText: 'Mid-century inspired living room with a textured cream sectional sofa, black triangular coffee table, and open kitchen in the background, styled with soft neutral tones and layered books and objects.' },
+      { id: 11, name: 'Colorful Spunky Modern', imageUrl: '/images/Interiors/p11-colorfulSpunkyModern.jpg', altText: 'Sunlit living room filled with potted plants, colorful modern artwork, a gray sectional sofa, and warm wood furniture, blending mid-century and eclectic styles.' },
+      { id: 12, name: 'Colorful Open Airy', imageUrl: '/images/Interiors/p12-colorfulOpenAiry.webp', altText: 'Spanish-inspired living room with arched windows, terracotta floors, a white sofa with bold pink and orange accent pillows. Ornate ceramic lamps on a carved wooden table give a rustic feel to the interior.' },
+    ],
+  },
+  {
+    id: 16,
+    type: 'multiSelect',
+    number: 16,
+    title: 'Word Description',
+    description: 'When thinking about your new space, what words come to mind?',
+    options: [
+        { id: 1, name: 'Calm' },
+        { id: 2, name: 'Joyful' },
+        { id: 3, name: 'Safe' },
+        { id: 4, name: 'Private' },
+    ],
+  },
+  {
+    id: 17,
+    type: 'multiSelect',
+    number: 17,
+    title: 'Ideal Room',
+    description: 'What words best describe your ideal room?',
+    options: [
+        { id: 1, name: 'Cozy' },
+        { id: 2, name: 'Minimal' },
+        { id: 3, name: 'Colorful' },
+        { id: 4, name: 'Organized' },
+        { id: 5, name: 'Vibrant' },
+        { id: 6, name: 'Peaceful' },
+    ],
+  },
+  {
+    id: 18,
+    type: 'pictureSelection',
+    number: 18,
+    title: 'Comfort Colors',
+    description: 'What colors bring a sense of calm or comfort to you?',
+    options: [
+      { id: 1, name: 'Brights - Reds, yellows, blues', description: 'Brights - Reds, yellows, blues', imageUrl: '/images/colorpalettes/bright.png', altText: 'Brights - Reds, yellows, blues' },
+      { id: 2, name: 'Neutrals - navy, gray, beige, tan', description: 'Neutrals - navy, gray, beige, tan', imageUrl: '/images/colorpalettes/neutrals.png', altText: 'Neutrals - navy, gray, beige, tan' },
+      { id: 3, name: 'Subtle - cream, taupe, gray, burgundy', description: 'Subtle - cream, taupe, gray, burgundy', imageUrl: '/images/colorpalettes/subtle.png', altText: 'Subtle - cream, taupe, gray, burgundy' },
+      { id: 4, name: 'Lights - pastels, pinks, pale blues, ivory, lavender', description: 'Lights - pastels, pinks, pale blues, ivory, lavender', imageUrl: '/images/colorpalettes/lights.png', altText: 'Lights - pastels, pinks, pale blues, ivory, lavender' },
+      { id: 5, name: 'Daring - red, hot pink, black/white', description: 'Daring - red, hot pink, black/white', imageUrl: '/images/colorpalettes/daring.png', altText: 'Daring - red, hot pink, black/white' },
+      { id: 6, name: 'Offbeat - mustard, chartreuse, plum, magenta', description: 'Offbeat - mustard, chartreuse, plum, magenta', imageUrl: '/images/colorpalettes/offbeat.png', altText: 'Offbeat - mustard, chartreuse, plum, magenta' },
+      { id: 7, name: 'Contrasting - black, white, royal blue, red', description: 'Contrasting - black, white, royal blue, red', imageUrl: '/images/colorpalettes/contrasting.png', altText: 'Contrasting - black, white, royal blue, red' },
+    ]
+  },
+  {
+    id: 19,
+    type: 'scale',
+    number: 19,
+    title: 'Lighting',
+    description: 'What kind of light environment do you prefer?',
+    options: [
+      { id: 1, name: 'Bright Daylight' },
+      { id: 2, name: 'Soft Warm Glow' },
+      { id: 3, name: 'Low Light' },
+    ],
+  },
+  {
+    id: 20,
+    type: 'multiSelect',
+    number: 20,
     title: 'Favorite Scent',
     description: 'Is there a smell or scent that brings you peace?',
     options: [
@@ -208,39 +278,51 @@ const quizQuestions: Question[] = [
     ],
   },
   {
-    id: 16,
-    type: 'scale',
-    number: 16,
-    title: 'Fabric Texture',
-    description: 'What texture do you prefer in cloth?',
-    options: [
-      { id: 1, name: 'Rough' },
-      { id: 2, name: 'Slightly Rough' },
-      { id: 3, name: 'Medium' },
-      { id: 4, name: 'Slightly Soft' },
-      { id: 5, name: 'Soft' },
-    ]
-  },
-  {
-    // NOTE: Add pictures for each option
-    id: 17,
+    id: 21,
     type: 'pictureSelection',
-    number: 17,
-    title: 'Calming Colors',
-    description: 'What colors bring a sense of calm or comfort for you?',
+    number: 21,
+    title: 'Comfort Materials',
+    description: 'Choose up to 3 materials that bring you comfort:',
     options: [
-        { id: 1, name: 'Earth tones' },
-        { id: 2, name: 'Warm neutrals' },
-        { id: 3, name: 'Muted blues' },
-        { id: 4, name: 'Yellows' },
-        { id: 5, name: 'Pastels' },
-        { id: 6, name: 'Vibrant colors' },
+      { id: 1, name: 'Cotton' },
+      { id: 2, name: 'Velvet' },
+      { id: 3, name: 'Leather' },
+      { id: 4, name: 'Linen' },
+      { id: 5, name: 'Faux Fur' },
+      { id: 6, name: 'Reclaimed Wood' },
+      { id: 7, name: 'Stone' },
     ],
   },
   {
-    id: 18,
+    id: 22,
+    type: 'multipleChoice',
+    number: 22,
+    title: 'Patterns',
+    description: 'How do you feel about patterns in your space?',
+    options: [
+      { id: 1, name: 'Love them, they add energy' },
+      { id: 2, name: 'Some are fine, but not too much' },
+      { id: 3, name: 'I prefer no patterns, just solid colors' },
+    ],
+  },
+  {
+    id: 23,
     type: 'pictureSelection',
-    number: 18,
+    number: 23,
+    title: 'Patterns Details',
+    description: 'What patterns do you like?',
+    options: [
+      { id: 1, name: 'Stripes' },
+      { id: 2, name: 'Polka Dots' },
+      { id: 3, name: 'Florals' },
+      { id: 4, name: 'Geometric Shapes' },
+      { id: 5, name: 'No patterns' },
+    ],
+  },
+  {
+    id: 24,
+    type: 'pictureSelection',
+    number: 24,
     title: 'Artwork',
     description: 'What type of artwork speaks to you?',
     options: [
@@ -250,70 +332,6 @@ const quizQuestions: Question[] = [
         { id: 4, name: 'Culturally relevant art styles' },
         { id: 5, name: 'Unsure' },
     ],
-  },
-  {
-    id: 19,
-    type: 'dropdown',
-    number: 19,
-    title: 'Allergies',
-    description: 'Are you allergic to any scents, plants, or fabrics?',
-    options: [
-        { id: 1, name: 'Yes' },
-        { id: 2, name: 'No' },
-    ],
-  },
-  {
-    id: 20,
-    type: 'text',
-    number: 20,
-    title: 'Allergy Information',
-    description: 'If allergic to any of these items listed above, please explain.',
-    options: [],
-    inputType: 'text'
-  },
-  {
-    id: 21,
-    type: 'dropdown',
-    number: 21,
-    title: 'Pets',
-    description: 'Do you have any pets?',
-    options: [
-        { id: 1, name: 'Yes' },
-        { id: 2, name: 'No' },
-    ],
-  },
-  {
-    id: 22,
-    type: 'text',
-    number: 22,
-    title: 'Pets Information',
-    description: 'If you have any pets, please explain what type and how many',
-    options: [],
-    inputType: 'text'
-  },
-  {
-    id: 23,
-    type: 'multiSelect',
-    number: 23,
-    title: 'One Word Description',
-    description: 'When thinking about your new space, what is the one word that comes to mind?',
-    options: [
-        { id: 1, name: 'Calm' },
-        { id: 2, name: 'Joyful' },
-        { id: 3, name: 'Safe' },
-        { id: 4, name: 'Private' },
-        { id: 5, name: 'Cozy' },
-        { id: 6, name: 'Prefer not to say' },
-    ],
-  },
-  {
-    id: 24,
-    type: 'text',
-    number: 24,
-    title: 'Triggers',
-    description: 'Are there any textures or colors that you don\'t like or may bring up difficult memories for you?',
-    options: [],
-    inputType: 'text'
   },
   {
     id: 25,
@@ -326,13 +344,21 @@ const quizQuestions: Question[] = [
         { id: 2, name: 'Ocean/nature sounds' },
         { id: 3, name: 'Silence' },
         { id: 4, name: 'Favorite songs' },
-        { id: 5, name: 'Prefer not to say' },
     ],
   },
   {
     id: 26,
     type: 'text',
     number: 26,
+    title: 'Favorite Songs',
+    description: 'Are there any songs or genres that evoke pure joy for you?',
+    options: [],
+    inputType: 'text'
+  },
+  {
+    id: 27,
+    type: 'text',
+    number: 27,
     title: 'Favorite Way to Relax',
     description: 'What\'s your favorite way to relax at home?',
     options: [
@@ -343,7 +369,43 @@ const quizQuestions: Question[] = [
         { id: 5, name: 'Prefer not to say' },
     ],
     inputType: 'text'
-  }
+  },
+  {
+    id: 28,
+    type: 'multiSelect',
+    number: 28,
+    title: 'Spiritual or Religious Elements',
+    description: 'Are there any spiritual or religious elements you\'d like reflected in your home?',
+    options: [
+      { id: 1, name: 'Prayer space' },
+      { id: 2, name: 'Altar' },
+      { id: 3, name: 'Incense area' },
+      { id: 4, name: 'Other' },
+    ],
+  },
+  {
+    id: 29,
+    type: 'multiSelect',
+    number: 29,
+    title: 'Triggers',
+    description: 'Are there any sights, sounds, or materials that make you feel overwhelmed, anxious, or unsafe?',
+    options: [
+      { id: 1, name: 'Fluorescent lighting' },
+      { id: 2, name: 'Metal surfaces' },
+      { id: 3, name: 'Clutter' },
+      { id: 4, name: 'Loud patterns' },
+      { id: 5, name: 'Other' },
+    ],
+  },
+  {
+    id: 30,
+    type: 'text',
+    number: 30,
+    title: 'Other Triggers',
+    description: 'Is there anything else you\'d like to share about your preferences or things you\'d like to avoid in your new home?',  
+    options: [],
+    inputType: 'text'
+  },
 ];
 
 export default quizQuestions; 
