@@ -1,16 +1,27 @@
 /* Progress bar styles */
 .progress-bar-container {
-  position: fixed;
-  top: 100px; /* Position right below the 100px header */
-  left: 0;
+  position: relative; /* Changed from fixed to relative */
   width: 100%;
   height: 8px; /* Slightly thicker */
   background-color: var(--color-white-shadow);
-  z-index: 900; /* Below header (1000) but above other content */
+  margin-bottom: 16px; /* Add some space below the progress bar */
 }
 
 .progress-bar {
   height: 100%;
   background-color: var(--color-yellow);
   transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -2px;
+  width: 12px;
+  height: 12px;
+  background-color: var(--color-yellow);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(191, 149, 38, 0.6);
 } 

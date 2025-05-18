@@ -1,15 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import type { FC } from 'react';
 import axios from 'axios';
 import quizQuestions from './QuizQuestions';
 import type { Question } from './QuizQuestions';
 import './QuizStyle.css';
 
+
 const API_URL = import.meta.env.VITE_API_URL;
 
-const Quiz: FC = () => {
+interface QuizProps {
+  onQuestionChange?: (index: number) => void;
+}
+
+const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const [responses, setResponses] = useState<Record<number, string | number | number[] | null>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
+  const questionSectionRef = useRef<HTMLElement>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -27,6 +37,13 @@ const Quiz: FC = () => {
     });
     setResponses(prev => (Object.keys(prev).length === 0 ? initialResponses : prev));
   }, []);
+
+  useEffect(() => {
+    // Notify parent component when question changes
+    if (onQuestionChange) {
+      onQuestionChange(currentQuestionIndex);
+    }
+  }, [currentQuestionIndex, onQuestionChange]);
 
   const handleOptionSelect = (questionId: number, optionId: number) => {
     setResponses((prev) => ({ ...prev, [questionId]: optionId }));
@@ -53,15 +70,49 @@ const Quiz: FC = () => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
+  const animateQuestionTransition = (newIndex: number, direction: 'next' | 'prev') => {
+    setTransitionDirection(direction);
+    setIsTransitioning(true);
+    
+    // Add exit animation classes
+    if (questionSectionRef.current) {
+      questionSectionRef.current.classList.add('question-exit', 'question-exit-active');
+    }
+  
+    setTimeout(() => {
+      setCurrentQuestionIndex(newIndex);
+      
+      // Remove exit classes and add enter classes
+      if (questionSectionRef.current) {
+        questionSectionRef.current.classList.remove('question-exit', 'question-exit-active');
+        questionSectionRef.current.classList.add('question-enter');
+        
+        // Force reflow to ensure the enter animation plays
+        void questionSectionRef.current.offsetHeight;
+        
+        // Start enter animation
+        questionSectionRef.current.classList.add('question-enter-active');
+        
+        // Clean up after animation completes
+        setTimeout(() => {
+          if (questionSectionRef.current) {
+            questionSectionRef.current.classList.remove('question-enter', 'question-enter-active');
+            setIsTransitioning(false);
+          }
+        }, 300);
+      }
+    }, 300);
+  };
+  
   const goToNextQuestion = () => {
-    if (currentQuestionIndex < quizQuestions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+    if (currentQuestionIndex < quizQuestions.length - 1 && !isTransitioning) {
+      animateQuestionTransition(currentQuestionIndex + 1, 'next');
     }
   };
-
+  
   const goToPreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+    if (currentQuestionIndex > 0 && !isTransitioning) {
+      animateQuestionTransition(currentQuestionIndex - 1, 'prev');
     }
   };
 
@@ -339,7 +390,12 @@ const Quiz: FC = () => {
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
       <form onSubmit={handleSubmit}>
-        <section className="question-section">
+        <section 
+          ref={questionSectionRef}
+          className={`question-section ${isTransitioning ? 
+            (transitionDirection === 'next' ? 'question-exit' : 'question-enter') : 
+            ''}`}
+        >
           <div className="question-heading">
             <h2 id={`question-${currentQuestion.id}`}>
               <span className="question-number">{currentQuestion.number}</span>
@@ -356,16 +412,17 @@ const Quiz: FC = () => {
             type="button" 
             className="nav-button prev-button"
             onClick={goToPreviousQuestion}
-            disabled={currentQuestionIndex === 0}
+            disabled={currentQuestionIndex === 0 || isTransitioning}
           >
             Previous
           </button>
+          
           {!isLastQuestion ? (
             <button 
               type="button" 
               className="nav-button next-button"
               onClick={goToNextQuestion}
-              disabled={isNextDisabled()}
+              disabled={isNextDisabled() || isTransitioning}
             >
               Next
             </button>
@@ -379,6 +436,7 @@ const Quiz: FC = () => {
             </button>
           )}
         </div>
+        
         {isSubmitting && (
           <div className="submitting-message">
             Submitting...
