@@ -70,15 +70,32 @@ process.on('unhandledRejection', (err) => {
 // Initialize MongoDB connection
 connectWithRetry();
 
-// Routes
+// Import routes
 const designPreferencesRoutes = require('./routes/designPreferences');
 const recommendationsRoutes = require('./routes/recommendations');
 const styleQuizRoutes = require('./routes/styleQuiz');
+const designController = require('./controllers/designController');
+const designGenerationController = require('./controllers/designGenerationController');
 
+// API Routes
 app.use('/api/design-preferences', designPreferencesRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/style-quiz', styleQuizRoutes);
 
+<<<<<<< HEAD
+// Design generation endpoints
+app.post('/api/v1/designs/generate', designGenerationController.generateDesign);
+app.get('/api/v1/designs/:designId/recommendations', designGenerationController.getDesignRecommendations);
+
+// Legacy endpoints (to be deprecated)
+app.post('/api/generate-design', designController.generateDesign);
+app.get('/api/design-recommendations', designController.getDesignRecommendations);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Express error:', err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+=======
 // Health check endpoint
 app.get('/health', (req, res) => {
     const health = {
@@ -88,6 +105,7 @@ app.get('/health', (req, res) => {
         database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
     };
     res.status(200).json(health);
+>>>>>>> origin/main
 });
 
 // Error handling middleware

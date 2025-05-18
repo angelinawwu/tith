@@ -1,11 +1,151 @@
 /* Quiz component styles */
+<<<<<<< HEAD
+:root {
+  --color-yellow: #FFC107;
+  --color-lavender: #E6E6FA;
+  --color-black: #1A1A1A;
+  --color-white: #FFFFFF;
+  --color-light-gray: #F5F5F5;
+  --color-medium-gray: #E0E0E0;
+  --color-dark-gray: #757575;
+}
 
+/* Quiz Completion Styles */
+.quiz-complete {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--color-white);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.quiz-complete h2 {
+  color: var(--color-black);
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.quiz-complete p {
+  color: var(--color-dark-gray);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background-color: var(--color-yellow);
+  color: var(--color-black);
+}
+
+.btn-primary:hover {
+  background-color: #e0a800;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.responses-summary {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--color-light-gray);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.responses-summary h3 {
+  margin-top: 0;
+  color: var(--color-black);
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.responses-summary pre {
+  background: var(--color-white);
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.button-group {
+  margin: 2rem 0;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary {
+  background-color: var(--color-lavender);
+  color: var(--color-black);
+}
+
+.btn-secondary:hover {
+  background-color: #d8d8f0;
+  transform: translateY(-2px);
+}
+
+.submitted-responses {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--color-light-gray);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.submitted-responses h3 {
+  color: var(--color-black);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.response-data {
+  background: var(--color-white);
+  padding: 1rem;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--color-medium-gray);
+}
+
+/* Quiz container styles */
+=======
+
+>>>>>>> origin/main
 .quiz-container {
   width: 100%;
   min-height: calc(100vh - 100px); /* Full height minus header */
   max-width: 1000px;
+<<<<<<< HEAD
+  min-width: 320px;
+  margin: 0 auto 40px; /* Remove top margin since we're using body padding */
+  padding: 0 15px;
+=======
   margin: 0 auto;
   padding: 1rem 15px;
+>>>>>>> origin/main
   box-sizing: border-box;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--color-white);
