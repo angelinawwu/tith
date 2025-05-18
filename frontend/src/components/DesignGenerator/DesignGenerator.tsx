@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
-import axios, { type AxiosError } from 'axios';
+import axios from 'axios';
 import './DesignGenerator.css';
+
+// Define Axios error type
+type AxiosErrorType = {
+  response?: {
+    data?: {
+      error?: string;
+      details?: string;
+    };
+  };
+  message?: string;
+};
 
 interface QuizResponses {
   personalInfo?: {
@@ -72,11 +83,10 @@ const DesignGenerator: React.FC<DesignGeneratorProps> = ({ quizResponses, onBack
           });
         }
       } catch (error) {
-        const err = error as AxiosError<{ error?: string; details?: string }>;
-        console.error('Error generating design:', err);
+        console.error('Error generating design:', error);
         setError({
           message: 'An error occurred while generating your design',
-          details: err.response?.data?.error || err.message || 'Please try again later.'
+          details: (error as AxiosErrorType).response?.data?.error || (error as Error).message || 'Please try again later.'
         });
       } finally {
         setIsGenerating(false);
@@ -108,11 +118,10 @@ const DesignGenerator: React.FC<DesignGeneratorProps> = ({ quizResponses, onBack
         });
       }
     } catch (error) {
-      const err = error as AxiosError<{ error?: string; details?: string }>;
-      console.error('Error regenerating design:', err);
+      console.error('Error regenerating design:', error);
       setError({
         message: 'An error occurred while regenerating your design',
-        details: err.response?.data?.error || err.message || 'Please try again.'
+        details: (error as AxiosErrorType).response?.data?.error || (error as Error).message || 'Please try again.'
       });
     } finally {
       setIsGenerating(false);

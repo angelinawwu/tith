@@ -31,7 +31,7 @@ const LandingPage = ({ onTransitionComplete }: LandingPageAppProps) => {
         <div className="landing-page-right-container">
           <h1 className="landing-page-title">Welcome to<br />Tori's Style Quiz</h1>
           <p className="landing-page-description">
-            Create a vision for your dream home
+            Create a vision for your dream home!
           </p>
           <div className="start-section">
             <MousePointerClick className="start-section-icon" />
