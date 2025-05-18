@@ -803,7 +803,7 @@
   transition: all 0.3s ease;
   overflow: hidden;
   text-align: center;
-  height: 220px;
+  min-height: 220px; /* Changed from fixed height to min-height */
 }
 
 .picture-option-label:hover {
@@ -824,12 +824,16 @@
   font-size: 0.9rem;
   color: var(--color-black);
   line-height: 1.4;
-  padding: 0 0.75rem 0.75rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+  flex: 1;
+  display: block;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .option-image {
   width: 100%;
-  height: 100%;
+  height: 75%;
   object-fit: cover;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -946,42 +950,13 @@
 .auto-tts-checkbox:checked {
   background-color: var(--color-yellow);
   border-color: var(--color-yellow);
-  justify-content: flex-start;
-  padding: 0;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  text-align: center;
-  height: 220px;
 }
 
-.picture-option-label:hover {
-  border-color: var(--color-yellow);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
 
-.picture-option input[type="radio"]:checked + .picture-option-label {
-  border-color: var(--color-yellow);
-  background-color: rgba(255, 193, 7, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
-}
-
-.option-text {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--color-black);
-  line-height: 1.4;
-  padding: 0 0.75rem 0.75rem;
-}
 
 .option-image {
   width: 100%;
-  height: 100%;
+  height: 160px; /* Fixed height instead of 100% */
   object-fit: cover;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
