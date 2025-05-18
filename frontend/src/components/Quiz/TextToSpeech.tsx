@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 // Need to install @types/react-icons package to fix the type error
-import { FaVolumeUp, FaList } from 'react-icons/fa';
+import { Volume2, ListVideo } from 'lucide-react';
 
 interface TextToSpeechProps {
   text: string;
@@ -77,23 +77,25 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({
     <div className="tts-container">
       {text && (
         <button
+          type="button"
           onClick={() => speak(text)}
           className={`speaker-button ${sizeClasses[size]} ${className}`}
           aria-label="Read question aloud"
           title="Read question aloud"
         >
-          <FaVolumeUp />
+          <Volume2 />
           {showLabel && <span className="tts-label">Read Question</span>}
         </button>
       )}
       {allOptions && showAllOptions && (
         <button
+          type="button"
           onClick={speakAllOptions}
           className={`speaker-button ${sizeClasses[size]} ${className}`}
           aria-label="Read all options"
           title="Read all options"
         >
-          <FaList />
+          <ListVideo />
           {showLabel && <span className="tts-label">Read All Options</span>}
         </button>
       )}

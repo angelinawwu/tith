@@ -20,12 +20,10 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const questionSectionRef = useRef<HTMLElement>(null);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoTTS, setAutoTTS] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
-  const [showResults, setShowResults] = useState(false);
 
   // Questions that should have "Other" option
   const QUESTIONS_WITH_OTHER = [4, 5, 25, 28, 29];
@@ -115,10 +113,15 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' && !isSubmitDisabled && currentQuestionIndex === quizQuestions.length - 1) {
-      handleSubmit(event as unknown as React.FormEvent);
-    } else if (event.key === 'Enter' && currentQuestionIndex < quizQuestions.length - 1) {
-      goToNextQuestion();
+    if (event.key === 'Enter') {
+      // Prevent default Enter behavior which submits forms
+      event.preventDefault();
+      
+      if (!isSubmitDisabled && currentQuestionIndex === quizQuestions.length - 1) {
+        handleSubmit(event as unknown as React.FormEvent);
+      } else if (currentQuestionIndex < quizQuestions.length - 1) {
+        goToNextQuestion();
+      }
     }
   };
 
@@ -209,7 +212,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
         console.error('Response status:', error.response.status);
         console.error('Response headers:', error.response.headers);
       }
-      setError('Failed to submit quiz. Please try again.');
+      console.error('Failed to submit quiz. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -583,7 +586,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
 
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}>
         {renderAutoTTSToggle()}
         <section 
           ref={questionSectionRef}

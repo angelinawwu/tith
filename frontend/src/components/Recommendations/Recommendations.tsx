@@ -34,7 +34,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ styleSummary, onBack 
           text: styleSummary,
           limit: 6
         });
-        setRecommendations(response.data.matches || []);
+        setRecommendations((response.data as any).matches || []);
       } catch (err) {
         console.error('Error fetching recommendations:', err);
         setError('Failed to load recommendations. Please try again later.');

@@ -209,10 +209,10 @@
   color: var(--color-black);
   margin-bottom: 1rem; /* Consistent margin */
 
-  @media (max-width: 768px) {
+  /* @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
-  }
+  } */
 }
 
 

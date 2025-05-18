@@ -149,7 +149,7 @@ const DesignResults: React.FC<DesignResultsProps> = ({ onStartOver }) => {
 
       <div className="mt-16 flex" style={{ justifyContent: 'flex-start', marginLeft: '20px' }}>
         <button
-          onClick={goToLandingPage}
+          onClick={goToLandingPage || onStartOver}
           className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
           Start Over
