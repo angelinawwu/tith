@@ -7,6 +7,11 @@ import './QuizStyle.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+interface QuizResponse {
+  [key: number]: string | number | number[] | null;
+}
+// Type for tracking quiz responses
+
 const Quiz: FC = () => {
   const [responses, setResponses] = useState<Record<number, string | number | number[] | null>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -30,6 +35,22 @@ const Quiz: FC = () => {
     setResponses(prev => (Object.keys(prev).length === 0 ? initialResponses : prev));
   }, []);
 
+  useEffect(() => {
+    const initialResponses: Record<number, string | number | number[] | null> = {};
+    quizQuestions.forEach((question: Question) => {
+      if (question.type === 'text' || 
+          (question as { inputType?: string }).inputType === 'email' || 
+          (question as { inputType?: string }).inputType === 'tel') {
+        initialResponses[question.id] = '';
+      } else if (question.type === 'multiSelect') {
+        initialResponses[question.id] = [];
+      } else {
+        initialResponses[question.id] = null;
+      }
+    });
+    setResponses(prev => (Object.keys(prev).length === 0 ? initialResponses : prev));
+  }, []);
+
   const handleOptionSelect = (questionId: number, optionId: number) => {
     setResponses((prev) => ({ ...prev, [questionId]: optionId }));
   };
@@ -37,6 +58,7 @@ const Quiz: FC = () => {
   const handleMultiSelectOption = (questionId: number, optionId: number) => {
     setResponses((prev) => {
       const currentSelections = prev[questionId] as number[] || [];
+      
       if (currentSelections.includes(optionId)) {
         return {
           ...prev,
@@ -78,6 +100,7 @@ const Quiz: FC = () => {
   const validateForm = useCallback((): boolean => {
     try {
       const email = String(responses[3] || '').trim();
+      
       if (email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -85,6 +108,8 @@ const Quiz: FC = () => {
         }
       }
       return true;
+      
+      
     } catch (err) {
       console.error('Validation error:', err);
       return false;
@@ -94,7 +119,9 @@ const Quiz: FC = () => {
   const isCurrentQuestionAnswered = useCallback(() => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     const response = responses[currentQuestion.id];
+    
     if (response === null || response === undefined) return false;
+    
     if (currentQuestion.type === 'text') {
       return typeof response === 'string' && response.trim() !== '';
     } else if (currentQuestion.type === 'multiSelect') {
@@ -109,7 +136,7 @@ const Quiz: FC = () => {
     const currentQuestion = quizQuestions[currentQuestionIndex];
     return currentQuestion.required && !isCurrentQuestionAnswered();
   }, [currentQuestionIndex, isCurrentQuestionAnswered]);
-
+  
   const isSubmitDisabled = useMemo(() => {
     return !validateForm() || isSubmitting;
   }, [validateForm, isSubmitting]);
@@ -120,6 +147,140 @@ const Quiz: FC = () => {
     setError(null);
     try {
       console.log('Submitting quiz responses:', responses);
+    const cleanValue = <T,>(value: T): T | string | undefined => {
+      if (value === null || value === undefined) return undefined;
+      if (typeof value === 'string') return value.trim() || undefined;
+      if (Array.isArray(value)) return value.length > 0 ? value : undefined;
+      return value;
+    };
+
+    const formData: Record<string, unknown> = {};
+    
+    formData.personalInfo = {
+      firstName: cleanValue(responses[1]),
+      lastName: cleanValue(responses[2]),
+      email: cleanValue(responses[3]),
+      phoneNumber: cleanValue(responses[4])
+    };
+    
+    formData.demographics = {
+      gender: cleanValue(getMultipleOptionTexts(4, responses[4] as number[])),
+      ethnicity: cleanValue(getMultipleOptionTexts(5, responses[5] as number[])),
+      householdSize: cleanValue(getOptionText(6, responses[6] as number)),
+      fosterCare: responses[7] === 1,
+      disability: responses[8] === 1,
+      disabilityDetails: cleanValue(responses[9])
+    };
+    
+    formData.stylePreferences = {
+      homeMessage: cleanValue(getMultipleOptionTexts(10, responses[10] as number[])),
+      favoriteColors: cleanValue(getMultipleOptionTexts(11, responses[11] as number[])),
+      styleInWords: cleanValue(responses[12]),
+      styleAdmired: cleanValue(responses[13])
+    };
+    
+    formData.comfortFactors = {
+      peacePlace: cleanValue(responses[14]),
+      peaceScent: cleanValue(getMultipleOptionTexts(15, responses[15] as number[])),
+      fabrics: cleanValue(getMultipleOptionTexts(16, responses[16] as number[])),
+      calmColors: cleanValue(getMultipleOptionTexts(17, responses[17] as number[]))
+    };
+    
+    formData.environmentalPreferences = {
+      artTypes: cleanValue(getMultipleOptionTexts(18, responses[18] as number[])),
+      allergies: responses[19] === 1,
+      allergyDetails: cleanValue(responses[20]),
+      pets: responses[21] === 1,
+      petDetails: cleanValue(responses[22])
+    };
+    
+    formData.personalInterests = {
+      roomWords: cleanValue(getMultipleOptionTexts(23, responses[23] as number[]))
+    };
+    
+    formData.designElements = {
+      patternPreference: cleanValue(responses[24]),
+      patternTypes: cleanValue(getMultipleOptionTexts(25, responses[25] as number[])),
+      roomWords: cleanValue(getMultipleOptionTexts(26, responses[26] as number[]))
+    };
+    
+    if (responses[28]) {
+      formData.additionalNotes = cleanValue(responses[28]);
+    }
+    
+    const cleanedData = JSON.parse(JSON.stringify(formData, (_, value) => 
+      value === null || value === undefined || value === '' || 
+      (Array.isArray(value) && value.length === 0) ||
+      (typeof value === 'object' && value !== null && Object.keys(value).length === 0) ? undefined : value
+    ));
+
+    console.log('Submitting form with data:', cleanedData);
+    
+    try {
+      const response = await axios.post(
+        `http://localhost:5001/api/design-preferences/mock-user-id`,
+        cleanedData,
+        {
+          params: { complete: 'true' },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+        return optionIds.map(id => getOptionText(questionId, id));
+      };
+
+      const requestData = {
+        personalInfo: {
+          firstName: String(responses[1] || '').trim().split(' ')[0] || '',
+          lastName: String(responses[1] || '').trim().split(' ').slice(1).join(' ') || '',
+          phoneNumber: String(responses[2] || '').trim() || '',
+          email: String(responses[3] || '').trim() || ''
+        },
+        demographics: {
+          gender: getMultipleOptionTexts(4, responses[4] as number[]) || [],
+          ethnicity: getMultipleOptionTexts(5, responses[5] as number[]) || [],
+          householdSize: String(getOptionText(6, responses[6] as number) || '').trim() || '',
+          fosterCare: responses[7] === 1,
+          disability: responses[8] === 1,
+          disabilityDetails: String(responses[9] || '').trim() || '',
+        },
+        stylePreferences: {
+          homeMessage: getMultipleOptionTexts(10, responses[10] as number[]) || [],
+          favoriteColors: getMultipleOptionTexts(11, responses[11] as number[]) || [],
+          styleInWords: String(responses[12] || '').trim() || '',
+          styleAdmired: String(responses[13] || '').trim() || '',
+        },
+        comfortFactors: {
+          peacePlace: String(responses[14] || '').trim() || '',
+          peaceScent: getMultipleOptionTexts(15, responses[15] as number[]) || [],
+          fabrics: getMultipleOptionTexts(16, responses[16] as number[]) || [],
+          calmColors: getMultipleOptionTexts(17, responses[17] as number[]) || [],
+        },
+        environmentalPreferences: {
+          artTypes: getMultipleOptionTexts(18, responses[18] as number[]) || [],
+          allergies: responses[19] === 1,
+          allergyDetails: String(responses[20] || '').trim() || '',
+          pets: responses[21] === 1,
+          petDetails: String(responses[22] || '').trim() || '',
+        },
+        personalInterests: {
+          roomWords: getMultipleOptionTexts(23, responses[23] as number[]) || [],
+        },
+        designElements: {
+          patternPreference: String(responses[24] || '').trim() || '',
+          patternTypes: getMultipleOptionTexts(25, responses[25] as number[]) || [],
+          roomWords: getMultipleOptionTexts(26, responses[26] as number[]) || [],
+        },
+        generatedPreferences: {
+          colorPalette: [], // Will be generated by backend
+          moodboardImageUrl: '', // Will be generated by backend
+          suggestedFurniture: [] // Will be generated by backend
+        },
+        additionalNotes: String(responses[28] || '').trim() || '',
+      };
+      
+      console.log('Sending request to backend:', requestData);
+      
       // Generate a random userId for each submission
       const randomUserId = 'user_' + Math.random().toString(36).substr(2, 9);
       const finalPayload = {
@@ -154,15 +315,9 @@ const Quiz: FC = () => {
     return option?.name || '';
   };
 
-  const getMultipleOptionTexts = (questionId: number, optionIds: number[] | null): string[] => {
-    if (!optionIds || !Array.isArray(optionIds)) {
-      return [];
-    }
+  // Is the submit button disabled?
+  const isSubmitDisabled = isSubmitting;
 
-    return [];
-  };
-
-  // Render a picture selection question
   const renderPictureSelectionQuestion = (question: Question) => {
     return (
       <div className="picture-selection-options" role="radiogroup" aria-labelledby={`question-${question.id}`}>
@@ -230,11 +385,11 @@ const Quiz: FC = () => {
     const getPlaceholderText = () => {
       switch (question.inputType) {
         case 'tel':
-          return 'e.g., (555) 123-4567';
+          return 'ex: (555) 123-4567';
         case 'email':
-          return 'e.g., name@example.com';
+          return 'ex: name@example.com';
         case 'name':
-          return 'e.g., John Smith';
+          return 'ex: John Smith';
         default:
           return '';
       }
@@ -366,7 +521,6 @@ const Quiz: FC = () => {
 
   return (
     <div className="quiz-container" onKeyDown={handleKeyDown} tabIndex={0}>
-      <h1>Interior Design Style Quiz</h1>
       <form onSubmit={handleSubmit}>
         <section className="question-section">
           <div className="question-heading">
@@ -381,15 +535,14 @@ const Quiz: FC = () => {
         </section>
 
         <div className="navigation-container">
-          {currentQuestionIndex > 0 && (
-            <button 
-              type="button" 
-              className="nav-button prev-button"
-              onClick={goToPreviousQuestion}
-            >
-              Previous
-            </button>
-          )}
+          <button 
+            type="button" 
+            className="nav-button prev-button"
+            onClick={goToPreviousQuestion}
+            disabled={currentQuestionIndex === 0}
+          >
+            Previous
+          </button>
           
           {!isLastQuestion ? (
             <button 
