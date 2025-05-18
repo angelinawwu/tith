@@ -595,9 +595,10 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
               <span className="question-number">{currentQuestion.number}</span>
             </h2>
             <div className="question-text-container">
-            <p className="question-text">
-              {currentQuestion.description}
-            </p>
+              <p className="question-text">
+                {currentQuestion.description}
+                {currentQuestion.required && <span className="required-indicator">*</span>}
+              </p>
               <TextToSpeech 
                 text={currentQuestion.description} 
                 showAllOptions={false}
@@ -613,7 +614,7 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
                 type="button" 
                 className="nav-button prev-button"
                 onClick={goToPreviousQuestion}
-              disabled={currentQuestionIndex === 0}
+                disabled={currentQuestionIndex === 0}
               >
                 Previous
               </button>
@@ -637,6 +638,12 @@ const Quiz: FC<QuizProps> = ({ onQuestionChange }) => {
               </button>
             )}
           </div>
+          
+          {currentQuestion.required && (
+            <div className="required-note">
+              * This question is required
+            </div>
+          )}
         </section>
 
         {isSubmitting && (

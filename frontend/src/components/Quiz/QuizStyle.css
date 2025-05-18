@@ -1049,4 +1049,19 @@
   align-items: center;
   justify-content: flex-end;
   margin-top: 0.5rem;
+}
+
+.required-indicator {
+  color: var(--color-maroon);
+  margin-left: 0.25rem;
+  font-weight: bold;
+}
+
+.required-note {
+  color: var(--color-maroon);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+  text-align: right;
+  padding-right: 1rem;
 } 

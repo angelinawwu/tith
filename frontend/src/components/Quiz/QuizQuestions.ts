@@ -33,7 +33,8 @@ const quizQuestions: Question[] = [
     description: 'Full Name',
     options: [],
     placeholder: 'e.g., John Smith',
-    inputType: 'name'
+    inputType: 'name',
+    required: true
   },
   {
     id: 2,
@@ -43,7 +44,8 @@ const quizQuestions: Question[] = [
     description: 'Phone Number',
     options: [],
     placeholder: 'e.g., (555) 123-4567',
-    inputType: 'tel'
+    inputType: 'tel',
+    required: true
   },
   {
     id: 3,
@@ -53,7 +55,8 @@ const quizQuestions: Question[] = [
     description: 'Email Address',
     options: [],
     placeholder: 'e.g., name@example.com',
-    inputType: 'email'
+    inputType: 'email',
+    required: true
   },
   {
     id: 4,
@@ -97,6 +100,7 @@ const quizQuestions: Question[] = [
       { id: 3, name: '3' },
       { id: 4, name: '4+' },
     ],
+    required: true
   },
   {
     id: 7,
@@ -110,6 +114,7 @@ const quizQuestions: Question[] = [
       { id: 3, name: '2' },
       { id: 4, name: '3+' },
     ],
+    required: true
   },
   {
     id: 8,
@@ -121,6 +126,7 @@ const quizQuestions: Question[] = [
       { id: 1, name: 'Yes' },
       { id: 2, name: 'No' },
     ],
+    required: true
   },
   {
     id: 9,
@@ -154,6 +160,7 @@ const quizQuestions: Question[] = [
       { id: 2, name: 'No' },
       { id: 3, name: 'Prefer not to say' },
     ],
+    required: true
   },
   {
     id: 12,
@@ -174,6 +181,7 @@ const quizQuestions: Question[] = [
         { id: 1, name: 'Yes' },
         { id: 2, name: 'No' },
     ],
+    required: true
   },
   {
     id: 14,
@@ -203,7 +211,7 @@ const quizQuestions: Question[] = [
       { id: 10, name: 'Soft Bright Homey', imageUrl: '/images/Interiors/p10-softBrightHomey.jpg', altText: 'Mid-century inspired living room with a textured cream sectional sofa, black triangular coffee table, and open kitchen in the background, styled with soft neutral tones and layered books and objects.' },
       { id: 11, name: 'Colorful Spunky Modern', imageUrl: '/images/Interiors/p11-colorfulSpunkyModern.jpg', altText: 'Sunlit living room filled with potted plants, colorful modern artwork, a gray sectional sofa, and warm wood furniture, blending mid-century and eclectic styles.' },
       { id: 12, name: 'Colorful Open Airy', imageUrl: '/images/Interiors/p12-colorfulOpenAiry.webp', altText: 'Spanish-inspired living room with arched windows, terracotta floors, a white sofa with bold pink and orange accent pillows. Ornate ceramic lamps on a carved wooden table give a rustic feel to the interior.' },
-    ],
+    ]
   },
   {
     id: 16,
