@@ -80,7 +80,7 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({
         title="Read question aloud"
       >
         <FaVolumeUp />
-        <span className="tts-label">Read Question</span>
+        {/* <span className="tts-label">Read Question</span> */}
       </button>
       {allOptions && showAllOptions && (
         <button
@@ -90,7 +90,7 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({
           title="Read all options"
         >
           <FaList />
-          <span className="tts-label">Read All Options</span>
+          {/* <span className="tts-label">Read All Options</span> */}
         </button>
       )}
     </div>
